@@ -1,10 +1,9 @@
 import streamlit as st
-import math
 import numpy as np
 import plotly.graph_objects as go
 
 # -----------------------------------------------------------------------------
-# 1. CONFIGURACIÓN DE LA PÁGINA WEB
+# 1. CONFIGURACIÓN DE LA PÁGINA
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="Laboratorio Interactivo de Espectroscopía",
@@ -13,122 +12,168 @@ st.set_page_config(
 )
 
 # Constantes físicas
-hc_k = 1.438777  # h*c/k en cm*K
+h = 6.626e-34      # J·s (Planck)
+c = 2.998e10       # cm/s (Velocidad de la luz)
+k = 1.381e-23      # J/K (Boltzmann)
+hc_k = 1.438777    # cm·K
 
 # -----------------------------------------------------------------------------
-# 2. ENCABEZADO Y NAVEGACIÓN
+# 2. ENCABEZADO PRINCIPAL
 # -----------------------------------------------------------------------------
-st.title("🔬 Laboratorio Interactivo de Espectroscopía Molecular")
-st.markdown("Plataforma didáctica para la simulación de espectros de rotación y vibración-rotación.")
+st.title("🎓 LABORATORIO DE ESPECTROSCOPÍA PARA PRINCIPIANTES")
+st.markdown("""
+**Bienvenido/a al mundo de las moléculas y la luz.**  
+En este laboratorio interactivo aprenderás cómo las moléculas "bailan" (rotan) y "vibran" cuando absorben luz.
+""")
 
+# Navegación por Módulos
 tabs = st.tabs([
-    "🐍 Módulo 1: Introducción", 
-    "🎨 Módulo 2: ¿Qué es un Espectro?", 
-    "🌀 Módulo 3: Rotación (CO)", 
-    "🧪 Módulo 4: Vibración-Rotación (HCl)", 
-    "⚖️ Módulo 5: Efecto Isotópico", 
-    "📝 Módulo 6: Autoevaluación"
+    "🚀 Módulo 1: Primeros Pasos",
+    "🌈 Módulo 2: ¿Qué es un Espectro?",
+    "🔄 Módulo 3: Rotación (CO)",
+    "🌡️ Módulo 4: Vibración-Rotación (HCl)",
+    "⚖️ Módulo 5: Efecto Isotópico",
+    "📝 Módulo 6: Evaluación y Entregable"
 ])
 
 # -----------------------------------------------------------------------------
 # MÓDULO 1: PRIMEROS PASOS
 # -----------------------------------------------------------------------------
 with tabs[0]:
-    st.header("🐍 Módulo 1: Introducción y Constantes Fundamentales")
-    st.info("Bienvenido/a al laboratorio virtual. En esta sección repasamos las bases de la espectroscopía cuánctica.")
+    st.header("🚀 Módulo 1: Configuración Inicial y Constantes")
     
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("📏 Constantes Fundamentales")
-        st.latex(r"h = 6.626 \times 10^{-34} \text{ J}\cdot\text{s} \quad (\text{Planck})")
-        st.latex(r"c = 2.998 \times 10^{10} \text{ cm/s} \quad (\text{Velocidad de la luz})")
-        st.latex(r"k = 1.381 \times 10^{-23} \text{ J/K} \quad (\text{Boltzmann})")
-    
-    with col2:
-        st.subheader("💡 ¿Sabías que?")
+        st.subheader("📌 Celda 1: Bienvenida al Entorno")
+        st.success("✅ Entorno interactivo y librerías numéricas cargadas correctamente.")
         st.markdown("""
-        Estas constantes aparecen en las ecuaciones porque la espectroscopía es **cuántica**, no clásica.
-        Los cambios de energía en las moléculas ocurren en paquetes discretos (cuantos).
+        En esta guía interactiva exploraremos la interacción entre la radiación electromagnética y la materia. 
+        No se requiere experiencia en programación.
         """)
+
+    with col2:
+        st.subheader("📏 Celda 2: Las Constantes de la Naturaleza")
+        st.write("Estos números no cambian **NUNCA** en todo el universo:")
+        st.latex(rf"h = {h:.3e} \text{{ J}}\cdot\text{{s}} \quad (\text{{Planck}})")
+        st.latex(rf"c = {c:.3e} \text{{ cm/s}} \quad (\text{{Velocidad de la luz}})")
+        st.latex(rf"k = {k:.3e} \text{{ J/K}} \quad (\text{{Boltzmann}})")
+
+    st.info("""
+    💡 **¿Sabías que?** Estas constantes aparecen en las ecuaciones porque la espectroscopía es **CUÁNTICA**, no clásica. 
+    Los intercambios de energía ocurren en paquetes discretos llamados *cuantos*.
+    """)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 2: ¿QUÉ ES UN ESPECTRO?
 # -----------------------------------------------------------------------------
 with tabs[1]:
-    st.header("🎨 Módulo 2: Concepto de Espectro y Niveles de Energía")
+    st.header("🌈 Módulo 2: Visualizando Frecuencias y Transiciones")
     
-    col_ctrl, col_plot = st.columns([1, 2.5])
-    with col_ctrl:
-        st.subheader("⚙️ Configuración")
-        num_picos = st.slider("Número de transiciones (picos):", 1, 8, 5)
-        separacion = st.slider("Espaciado entre picos:", 1.0, 5.0, 3.0)
+    col_ctrl2, col_plot2 = st.columns([1, 2.2])
     
-    with col_plot:
-        frecuencias = np.linspace(0, 30, 500)
-        intensidad = np.zeros_like(frecuencias)
+    with col_ctrl2:
+        st.subheader("⚙️ Configuración del Espectro")
+        modo_espectro = st.radio("Seleccionar Celda:", ["Celda 3: Un solo pico", "Celda 4: Múltiples líneas (J=0,1,2...)"])
         
-        fig = go.Figure()
-        for i in range(num_picos):
-            f_centro = (i + 1) * separacion
-            amp = np.exp(-i * 0.2)
-            intensidad += amp * np.exp(-((frecuencias - f_centro)**2) / 0.5)
-            fig.add_vline(x=f_centro, line_dash="dash", line_color="red", opacity=0.4)
-            fig.add_annotation(x=f_centro, y=amp + 0.05, text=f"J={i}", showarrow=False)
+        st.markdown("""
+        📝 **ANOTA EN TU CUADERNO:**
+        1. El eje X es la **FRECUENCIA** (o número de onda) de la luz.
+        2. El eje Y es la **INTENSIDAD** (cuánta luz absorbe).
+        3. Cada **PICO** significa que la molécula absorbió luz al cambiar de estado.
+        """)
 
-        fig.add_trace(go.Scatter(x=frecuencias, y=intensidad, mode='lines', fill='tozeroy', line=dict(color='purple', width=2), name="Espectro"))
-        fig.update_layout(title="Simulación de un Espectro de Absorcón", xaxis_title="Frecuencia / Número de onda", yaxis_title="Intensidad", template="plotly_white", height=450)
-        st.plotly_chart(fig, use_container_width=True)
+    with col_plot2:
+        fig2 = go.Figure()
+        
+        if modo_espectro == "Celda 3: Un solo pico":
+            frec = np.linspace(0, 10, 200)
+            intens = np.exp(-((frec - 5)**2))
+            fig2.add_trace(go.Scatter(x=frec, y=intens, mode='lines', fill='tozeroy', line=dict(color='purple', width=3), name="Transición única"))
+            fig2.update_layout(title="Ejemplo de ESPECTRO: Un solo pico = una transición", xaxis_title="Frecuencia", yaxis_title="Intensidad")
+        else:
+            frec = np.linspace(0, 20, 300)
+            picos = [3, 6, 9, 12, 15]
+            intens = sum(0.8**(i) * np.exp(-((frec - x)**2)) for i, x in enumerate(picos))
+            fig2.add_trace(go.Scatter(x=frec, y=intens, mode='lines', fill='tozeroy', line=dict(color='purple', width=2), name="Espectro Múltiple"))
+            for i, x in enumerate(picos):
+                fig2.add_vline(x=x, line_dash="dash", line_color="red", opacity=0.5)
+                fig2.add_annotation(x=x, y=0.8**(i) + 0.08, text=f"J={i}", showarrow=False)
+            fig2.update_layout(title="Espectro con MÚLTIPLES transiciones", xaxis_title="Frecuencia", yaxis_title="Intensidad")
+
+        fig2.update_layout(template="plotly_white", height=450)
+        st.plotly_chart(fig2, use_container_width=True)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 3: ESPECTROSCOPÍA ROTACIONAL (CO)
 # -----------------------------------------------------------------------------
 with tabs[2]:
-    st.header("🌀 Módulo 3: Espectro Rotacional Puro (Microondas - CO)")
+    st.header("🔄 Módulo 3: Espectroscopía Rotacional (La que hace girar)")
     
-    col3_ctrl, col3_plot = st.columns([1, 2.5])
-    with col3_ctrl:
-        st.subheader("⚙️ Parámetros de Control")
-        r_CO = st.slider("Longitud de enlace (Å):", min_value=0.8, max_value=1.5, value=1.128, step=0.005)
-        T_CO = st.slider("Temperatura (K):", min_value=10, max_value=500, value=298, step=10, key="T_CO")
-        
-        # Cálculos de CO
-        masa_C = 12.01 * 1.66054e-27
-        masa_O = 16.00 * 1.66054e-27
-        mu = (masa_C * masa_O) / (masa_C + masa_O)
-        I = mu * (r_CO * 1e-10)**2
-        B_GHz = (6.626e-34 / (8 * (np.pi**2) * I)) * 1e-9
-        espaciado_CO = 2 * B_GHz
-        
-        st.info(f"**Constante Rotacional (B):** {B_GHz:.2f} GHz\n\n**Espaciado (2B):** {espaciado_CO:.2f} GHz")
+    col_ctrl3, col_plot3 = st.columns([1, 2.2])
     
-    with col3_plot:
-        J_vals = np.arange(0, 10)
-        frec_rot = [2 * B_GHz * (J + 1) for J in J_vals]
-        int_rot = [(2*J + 1) * np.exp(- (B_GHz * 1e9 * 6.626e-34 * J * (J + 1)) / (1.381e-23 * max(T_CO, 1))) for J in J_vals]
+    with col_ctrl3:
+        st.subheader("⚙️ Celda 5: Simulador de CO")
+        r_CO = st.slider("Longitud de enlace (Å):", min_value=0.80, max_value=1.50, value=1.128, step=0.001)
+        T_CO = st.slider("Temperatura (K):", min_value=10, max_value=500, value=298, step=10, key="t_co")
+        
+        # Cálculos físicos del CO
+        masa_C = 12.01 * 1.66e-27
+        masa_O = 16.00 * 1.66e-27
+        mu_CO = (masa_C * masa_O) / (masa_C + masa_O)
+        I_CO = mu_CO * (r_CO * 1e-10)**2
+        B_CO_GHz = (h / (8 * (np.pi**2) * I_CO)) * 1e-9
+        espaciado_CO = 2 * B_CO_GHz
+        
+        st.info(f"""
+        📊 **RESULTADOS DE LA MOLÉCULA:**
+        * **Constante rotacional B:** {B_CO_GHz:.3f} GHz
+        * **Espaciado entre líneas (2B):** {espaciado_CO:.3f} GHz
+        * **Longitud ajustada (r):** {r_CO:.3f} Å
+        """)
+
+    with col_plot3:
+        J_vals = np.arange(0, 8)
+        frec_rot = [2 * B_CO_GHz * (J + 1) for J in J_vals]
+        int_rot = [(2*J + 1) * np.exp(-(B_CO_GHz * 1e9 * h * J * (J + 1)) / (k * max(T_CO, 1.0))) for J in J_vals]
         int_rot = np.array(int_rot) / max(int_rot) if max(int_rot) > 0 else int_rot
         
-        fig_rot = go.Figure()
-        for f, i_val in zip(frec_rot, int_rot):
-            fig_rot.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='purple', width=3), marker=dict(size=8, color='purple'), showlegend=False))
-        
-        fig_rot.update_layout(title=f"Espectro Rotacional del Monóxido de Carbono (CO) - r = {r_CO:.3f} Å", xaxis_title="Frecuencia (GHz)", yaxis_title="Intensidad Relativa", template="plotly_white", height=450)
-        st.plotly_chart(fig_rot, use_container_width=True)
+        fig3 = go.Figure()
+        for f, iv in zip(frec_rot, int_rot):
+            fig3.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines+markers', line=dict(color='purple', width=3), marker=dict(size=8, color='red'), showlegend=False))
+            
+        fig3.update_layout(
+            title=f"Espectro ROTACIONAL del CO — Longitud = {r_CO:.3f} Å",
+            xaxis_title="Frecuencia (GHz)",
+            yaxis_title="Intensidad relativa",
+            template="plotly_white",
+            height=400
+        )
+        st.plotly_chart(fig3, use_container_width=True)
+
+    st.subheader("📝 Celda 6: Preguntas Guiadas (Responde en tu cuaderno)")
+    st.markdown("""
+    1. **¿Qué pasa con las líneas cuando AUMENTAS la longitud de enlace?** ¿Se separan o se juntan? ¿Por qué crees?
+    2. **¿Qué pasa con las líneas cuando DISMINUYES la temperatura?** ¿Alguna línea desaparece? ¿Cuál?
+    3. **Para CO real, el espaciado es 115.3 GHz.** ¿Qué longitud de enlace obtienes en el simulador? *(Valor bibliográfico: 1.128 Å)*.
+    4. **Si duplicaras la masa del carbono**, ¿el espaciado aumentaría o disminuiría?
+    """)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: VIBRACIÓN-ROTACIÓN (HCl)
 # -----------------------------------------------------------------------------
 with tabs[3]:
-    st.header("🧪 Módulo 4: Espectro Vibracional-Rotacional (IR - HCl)")
+    st.header("🌡️ Módulo 4: Espectroscopía Vibracional-Rotacional (IR - HCl)")
     
-    col4_ctrl, col4_plot = st.columns([1, 2.5])
-    with col4_ctrl:
-        st.subheader("⚙️ Parámetros del HCl")
+    col_ctrl4, col_plot4 = st.columns([1, 2.2])
+    
+    with col_ctrl4:
+        st.subheader("⚙️ Celda 7: Simulador de HCl")
         B0_hcl = st.slider("B₀ (cm⁻¹):", 10.0, 10.8, 10.44, 0.01)
-        B1_hcl = st.slider("B₁ (cm⁻¹):", 9.8, 10.5, 10.136, 0.01)
-        nu0_hcl = st.slider("ν₀ (cm⁻¹):", 2800.0, 3000.0, 2885.9, 1.0)
-        T_hcl = st.slider("Temperatura (K):", 10, 500, 298, 10, key="T_hcl")
-        
-    with col4_plot:
+        B1_hcl = st.slider("B₁ (cm⁻¹):", 9.8, 10.5, 10.136, 0.001)
+        nu0_hcl = st.slider("ν₀ (cm⁻¹):", 2800.0, 3000.0, 2885.9, 0.1)
+        T_hcl = st.slider("Temperatura (K):", 10, 500, 298, 10, key="t_hcl")
+
+    with col_plot4:
         J_max = 12
         J_P = np.arange(1, J_max)
         frec_P = nu0_hcl - (B1_hcl + B0_hcl)*J_P + (B1_hcl - B0_hcl)*(J_P**2)
@@ -136,106 +181,135 @@ with tabs[3]:
         J_R = np.arange(0, J_max - 1)
         frec_R = nu0_hcl + (B1_hcl + B0_hcl)*(J_R + 1) + (B1_hcl - B0_hcl)*((J_R + 1)**2)
         
-        int_P = [(2*J + 1) * np.exp(- B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1)) for J in J_P]
-        int_R = [(2*J + 1) * np.exp(- B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1)) for J in J_R]
+        int_P = [(2*J + 1) * np.exp(-B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1.0)) for J in J_P]
+        int_R = [(2*J + 1) * np.exp(-B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1.0)) for J in J_R]
         
-        max_int = max(max(int_P), max(int_R))
-        int_P, int_R = np.array(int_P) / max_int, np.array(int_R) / max_int
+        max_i = max(max(int_P), max(int_R))
+        int_P, int_R = np.array(int_P) / max_i, np.array(int_R) / max_i
         
-        fig_hcl = go.Figure()
-        # Rama P (roja)
-        for f, i_val in zip(frec_P, int_P):
-            fig_hcl.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='red', width=2, dash='dash'), marker=dict(symbol='circle', color='red'), name="Rama P (ΔJ=-1)", showlegend=False))
-        # Rama R (azul)
-        for f, i_val in zip(frec_R, int_R):
-            fig_hcl.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), name="Rama R (ΔJ=+1)", showlegend=False))
-        
-        fig_hcl.add_vline(x=nu0_hcl, line_dash="dot", line_color="black")
-        fig_hcl.update_layout(title="Espectro Rovibracional del HCl (Ramas P y R)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad Relativa", template="plotly_white", height=450)
-        st.plotly_chart(fig_hcl, use_container_width=True)
+        fig4 = go.Figure()
+        for f, iv in zip(frec_P, int_P):
+            fig4.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines+markers', line=dict(color='red', width=2, dash='dash'), marker=dict(symbol='circle', color='red'), showlegend=False))
+        for f, iv in zip(frec_R, int_R):
+            fig4.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
+            
+        fig4.add_vline(x=nu0_hcl, line_dash="dot", line_color="black")
+        fig4.add_annotation(x=nu0_hcl, y=0.5, text="Origen ν₀", showarrow=False)
+        fig4.update_layout(title="Espectro INFRARROJO del HCl (Ramas P y R)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad relativa", template="plotly_white", height=400)
+        st.plotly_chart(fig4, use_container_width=True)
+
+    st.subheader("🔍 Celda 8: Identificando Transiciones Específicas")
+    col_t1, col_t2 = st.columns(2)
+    with col_t1:
+        st.markdown("**RAMA P ($\Delta J = -1$)**")
+        for J in range(1, 6):
+            val = nu0_hcl - (B1_hcl + B0_hcl)*J + (B1_hcl - B0_hcl)*(J**2)
+            st.write(f"* P({J}) $\\rightarrow$ **{val:.2f} cm⁻¹**")
+    with col_t2:
+        st.markdown("**RAMA R ($\Delta J = +1$)**")
+        for J in range(0, 5):
+            val = nu0_hcl + (B1_hcl + B0_hcl)*(J + 1) + (B1_hcl - B0_hcl)*((J + 1)**2)
+            st.write(f"* R({J}) $\\rightarrow$ **{val:.2f} cm⁻¹**")
+
+    st.info("🧪 **EXPERIMENTO:** Localiza $R(0)$ y $P(2)$. La diferencia $R(0) - P(2)$ dividida entre 4 te da $B_0$. ¡Compruébalo!")
 
 # -----------------------------------------------------------------------------
 # MÓDULO 5: EFECTO ISOTÓPICO
 # -----------------------------------------------------------------------------
 with tabs[4]:
-    st.header("⚖️ Módulo 5: Comparación Isotópica (H³⁵Cl vs H³⁷Cl)")
+    st.header("⚖️ Módulo 5: Efecto Isotópico (H³⁵Cl vs H³⁷Cl)")
     
-    mode_iso = st.radio("Modo de visualización:", ["Individual", "Superposición Directa"], horizontal=True)
+    modo_iso = st.radio("Seleccionar Celda de Estudio:", ["Celda 9: Isótopo Individual", "Celda 10: Superposición para Comparación Directa"], horizontal=True)
     
-    # Parámetros de los isótopos
     B0_35, B1_35, nu0_35 = 10.44, 10.136, 2885.9
     B0_37, B1_37, nu0_37 = 10.42, 10.120, 2883.8
     
     J_max = 12
-    J_P = np.arange(1, J_max)
-    J_R = np.arange(0, J_max - 1)
+    J_P, J_R = np.arange(1, J_max), np.arange(0, J_max - 1)
     
     frec_P35 = nu0_35 - (B1_35 + B0_35)*J_P + (B1_35 - B0_35)*(J_P**2)
     frec_R35 = nu0_35 + (B1_35 + B0_35)*(J_R + 1) + (B1_35 - B0_35)*((J_R + 1)**2)
-    
     frec_P37 = nu0_37 - (B1_37 + B0_37)*J_P + (B1_37 - B0_37)*(J_P**2)
     frec_R37 = nu0_37 + (B1_37 + B0_37)*(J_R + 1) + (B1_37 - B0_37)*((J_R + 1)**2)
     
-    # Intensidades aproximadas
-    int_P = [1.0 / (J + 1) for J in J_P]
-    int_R = [1.0 / (J + 2) for J in J_R]
+    int_P = np.array([1.0 / (J + 1) for J in J_P])
+    int_R = np.array([1.0 / (J + 2) for J in J_R])
     max_i = max(max(int_P), max(int_R))
-    int_P = np.array(int_P) / max_i
-    int_R = np.array(int_R) / max_i
+    int_P, int_R = int_P / max_i, int_R / max_i
 
-    fig_iso = go.Figure()
-    
-    if mode_iso == "Individual":
-        iso_select = st.selectbox("Seleccionar Isótopo:", ["H³⁵Cl", "H³⁷Cl"])
-        
+    def agregar_stems(fig, x_vals, y_vals, color, dash='solid', symbol='circle', name=""):
+        for x, y in zip(x_vals, y_vals):
+            fig.add_trace(go.Scatter(x=[x, x], y=[0, y], mode='lines', line=dict(color=color, width=2, dash=dash), showlegend=False))
+        fig.add_trace(go.Scatter(x=x_vals, y=y_vals, mode='markers', marker=dict(color=color, size=7, symbol=symbol), name=name))
+
+    fig5 = go.Figure()
+
+    if modo_iso == "Celda 9: Isótopo Individual":
+        iso_select = st.selectbox("Seleccionar Isótopo (Celda 9):", ["H³⁵Cl", "H³⁷Cl"])
         if iso_select == "H³⁵Cl":
-            for f, i_val in zip(frec_P35, int_P):
-                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='blue', width=2, dash='dot'), marker=dict(symbol='circle', color='blue'), showlegend=False))
-            for f, i_val in zip(frec_R35, int_R):
-                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
-            color_titulo = "Azul"
+            agregar_stems(fig5, frec_P35, int_P, 'blue', dash='dot', symbol='circle', name="H³⁵Cl - Rama P")
+            agregar_stems(fig5, frec_R35, int_R, 'blue', dash='solid', symbol='square', name="H³⁵Cl - Rama R")
         else:
-            for f, i_val in zip(frec_P37, int_P):
-                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='red', width=2, dash='dot'), marker=dict(symbol='circle', color='red'), showlegend=False))
-            for f, i_val in zip(frec_R37, int_R):
-                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='red', width=2), marker=dict(symbol='square', color='red'), showlegend=False))
-            color_titulo = "Rojo"
-            
-        fig_iso.update_layout(title=f"Espectro de {iso_select} ({color_titulo})", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad Relativa", template="plotly_white", height=450)
-        
+            agregar_stems(fig5, frec_P37, int_P, 'red', dash='dot', symbol='circle', name="H³⁷Cl - Rama P")
+            agregar_stems(fig5, frec_R37, int_R, 'red', dash='solid', symbol='square', name="H³⁷Cl - Rama R")
+        fig5.update_layout(title=f"Espectro de {iso_select}", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad relativa")
     else:
-        # Modo Superposición Directa (H35Cl en azul a altura 1.0 y H37Cl en rojo a altura 0.7)
-        for f in frec_P35:
-            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue', width=2, dash='dot'), marker=dict(symbol='circle', color='blue'), showlegend=False))
-        for f in frec_R35:
-            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
-        
-        for f in frec_P37:
-            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red', width=2, dash='dot'), marker=dict(symbol='circle', color='red'), showlegend=False))
-        for f in frec_R37:
-            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red', width=2), marker=dict(symbol='square', color='red'), showlegend=False))
+        agregar_stems(fig5, frec_P35, [1.0]*len(frec_P35), 'blue', dash='dot', symbol='circle', name="H³⁵Cl - Rama P")
+        agregar_stems(fig5, frec_R35, [1.0]*len(frec_R35), 'blue', dash='solid', symbol='square', name="H³⁵Cl - Rama R")
+        agregar_stems(fig5, frec_P37, [0.7]*len(frec_P37), 'red', dash='dot', symbol='circle', name="H³⁷Cl - Rama P")
+        agregar_stems(fig5, frec_R37, [0.7]*len(frec_R37), 'red', dash='solid', symbol='square', name="H³⁷Cl - Rama R")
+        fig5.update_layout(title="COMPARACIÓN DIRECTA: H³⁵Cl (azul) vs H³⁷Cl (rojo)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad (desplazada)")
 
-        fig_iso.update_layout(title="Comparación Isotópica Directa: H³⁵Cl (Azul) vs H³⁷Cl (Rojo - desplazado)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad (desplazada para comparar)", template="plotly_white", height=450)
+    fig5.update_layout(xaxis=dict(range=[2800, 2960]), template="plotly_white", height=450)
+    st.plotly_chart(fig5, use_container_width=True)
 
-    st.plotly_chart(fig_iso, use_container_width=True)
+    st.markdown("""
+    🔬 **¿QUÉ OBSERVAS EN EL EFECTO ISOTÓPICO?**
+    * **$\text{H}^{37}\text{Cl}$ tiene MASAS más pesadas**, por lo que se desplaza ligeramente a **menores frecuencias**.
+    * La forma general del espectro es **IDÉNTICA**.
+    * La constante de fuerza del enlace **NO cambia** con el isótopo.
+    """)
 
 # -----------------------------------------------------------------------------
-# MÓDULO 6: AUTOEVALUACIÓN
+# MÓDULO 6: MINI-EVALUACIÓN Y ENTREGABLE
 # -----------------------------------------------------------------------------
 with tabs[5]:
-    st.header("📝 Módulo 6: Cuestionario de Autoevaluación")
+    st.header("📝 Módulo 6: Mini-Evaluación y Entregable Final")
     
-    q1 = st.radio("1. ¿Qué tipo de movimiento molecular estudia la espectroscopía ROTACIONAL?", ["Vibración de los enlaces", "Rotación de la molécula como un todo", "Movimiento de los electrones", "Traslación de la molécula"])
-    q2 = st.radio("2. En el espectro rotacional del CO, las líneas están:", ["Todas a la misma frecuencia", "Igualmente espaciadas", "Más juntas a altas frecuencias", "Más separadas a altas frecuencias"])
-    q3 = st.radio("3. La RAMA P en el espectro IR del HCl corresponde a:", ["ΔJ = +1 (aumenta la rotación)", "ΔJ = -1 (disminuye la rotación)", "ΔJ = 0 (no cambia la rotación)", "Transiciones electrónicas"])
+    col_eval1, col_eval2 = st.columns(2)
     
-    if st.button("Calcular Calificación"):
-        score = 0
-        if q1 == "Rotación de la molécula como un todo": score += 33.3
-        if q2 == "Igualmente espaciadas": score += 33.3
-        if q3 == "ΔJ = -1 (disminuye la rotación)": score += 33.4
+    with col_eval1:
+        st.subheader("📝 Celda 11: Autoevaluación")
+        q1 = st.radio("1️⃣ ¿Qué movimiento estudia la espectroscopía ROTACIONAL?", ["a) Vibración de enlaces", "b) Rotación de la molécula completa", "c) Movimiento de electrones", "d) Traslación"])
+        q2 = st.radio("2️⃣ En el espectro rotacional del CO, las líneas están:", ["a) A la misma frecuencia", "b) Igualmente espaciadas", "c) Más juntas a alta frecuencia", "d) Más separadas a alta frecuencia"])
+        q3 = st.radio("3️⃣ La RAMA P en el espectro IR del HCl corresponde a:", ["a) ΔJ = +1", "b) ΔJ = -1", "c) ΔJ = 0", "d) Transición electrónica"])
+        q4 = st.radio("4️⃣ Si aumentamos la temperatura:", ["a) Se desplazan a menor frecuencia", "b) Aparecen líneas con J más altos", "c) Desaparece la rama R", "d) No cambia"])
+        q5 = st.radio("5️⃣ El H³⁷Cl tiene frecuencias menores que H³⁵Cl porque:", ["a) Menor constante de fuerza", "b) Mayor masa reducida", "c) Enlace más largo", "d) Es radiactivo"])
         
-        if score >= 70:
-            st.success(f"🎉 ¡Excelente resultado! Calificación: {score:.1f} / 100")
-        else:
-            st.warning(f"✍️ Calificación: {score:.1f} / 100. Revisa los módulos teóricos e inténtalo nuevamente.")
+        if st.button("Verificar Respuestas"):
+            score = 0
+            if "b)" in q1: score += 20
+            if "b)" in q2: score += 20
+            if "b)" in q3: score += 20
+            if "b)" in q4: score += 20
+            if "b)" in q5: score += 20
+            
+            st.success(f"🎉 Tu calificación es: {score} / 100")
+            st.info("Respuestas correctas: 1-b, 2-b, 3-b, 4-b, 5-b")
+
+    with col_eval2:
+        st.subheader("📋 Celda 12: Tabla de Resultados")
+        st.markdown("""
+        Completa los siguientes valores obtenidos durante el laboratorio:
+
+        | Molécula | Parámetro | Valor Obtenido | Valor Real |
+        | :--- | :--- | :--- | :--- |
+        | **CO** | Longitud de enlace $r$ (Å) | `______` | **1.128 Å** |
+        | **HCl** | Constante $B_0$ ($\text{cm}^{-1}$) | `______` | **10.44 $\text{cm}^{-1}$** |
+        | **HCl** | Constante $B_1$ ($\text{cm}^{-1}$) | `______` | **10.14 $\text{cm}^{-1}$** |
+        | **HCl** | Origen de banda $\nu_0$ ($\text{cm}^{-1}$) | `______` | **2886 $\text{cm}^{-1}$** |
+        | **H³⁷Cl** | Constante $B_0$ ($\text{cm}^{-1}$) | `______` | **10.42 $\text{cm}^{-1}$** |
+        """)
+        
+        st.subheader("🎯 Pregunta Final del Docente")
+        st.text_area("¿Por qué el CO tiene espectro rotacional pero el N₂ no? (Pista: busca 'momento dipolar'):", placeholder="Escribe tu respuesta aquí...")
