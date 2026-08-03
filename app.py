@@ -162,16 +162,16 @@ with tabs[2]:
     with col_ctrl:
         st.subheader("Parámetros de Simulación")
         
-        molecula_sel = st.selectbox("Molécula:", list(MOLECULAS_UAM.keys()), index=1) # CO por defecto
+        molecula_sel = st.selectbox("Molécula:", list(MOLECULAS_UAM.keys()), index=0)
         
         col_v1, col_v2 = st.columns(2)
         with col_v1:
-            v_lower = st.slider("v''", min_value=0, max_value=2, value=1)
+            v_lower = st.slider("v''", min_value=0, max_value=2, value=0)
         with col_v2:
-            v_upper = st.slider("v'", min_value=1, max_value=3, value=2)
+            v_upper = st.slider("v'", min_value=1, max_value=3, value=1)
             
-        T_val = st.slider("Temperatura", min_value=10.0, max_value=500.0, value=150.0, step=1.0)
-        ancho_mitad = st.slider("Ancho mitad", min_value=0.1, max_value=3.0, value=0.4, step=0.1)
+        T_val = st.slider("Temperatura", min_value=10.0, max_value=500.0, value=298.0, step=1.0)
+        ancho_mitad = st.slider("Ancho mitad", min_value=0.1, max_value=3.0, value=1.0, step=0.1)
         
         # Constantes espectroscópicas
         B_e, alpha_e, omega_e, omega_x_e = MOLECULAS_UAM[molecula_sel]
@@ -191,7 +191,7 @@ with tabs[2]:
         """)
 
     with col_plot:
-        J_max = 30
+        J_max = 25
         J_P = np.arange(1, J_max)
         frec_P = nu0 - (B1 + B0)*J_P + (B1 - B0)*(J_P**2)
         
@@ -202,28 +202,29 @@ with tabs[2]:
         int_P = [(2*J + 1) * np.exp(-B0 * J * (J + 1) * hc_k / max(T_val, 1.0)) for J in J_P]
         int_R = [(2*J + 1) * np.exp(-B0 * J * (J + 1) * hc_k / max(T_val, 1.0)) for J in J_R]
         
-        # Malla de alta resolución centrada ajustada a la banda (rango +- 100 cm-1)
-        x_min_crop = max(0, nu0 - 100)
-        x_max_crop = nu0 + 100
+        # Ancho de ventana dinámico en función de B0 para cubrir toda la banda
+        ancho_vista = max(120.0, 22.0 * B0)
+        x_min_crop = max(0, nu0 - ancho_vista)
+        x_max_crop = nu0 + ancho_vista
+        
         x_grid = np.linspace(x_min_crop, x_max_crop, 2000)
         y_grid = np.zeros_like(x_grid)
         
-        # Suma de perfiles gaussianos
         for f, iv in zip(frec_P, int_P):
             y_grid += iv * np.exp(-((x_grid - f)**2) / (2 * (ancho_mitad**2)))
         for f, iv in zip(frec_R, int_R):
             y_grid += iv * np.exp(-((x_grid - f)**2) / (2 * (ancho_mitad**2)))
 
-        # Escala de intensidad idéntica a la UAM (máximo relativo en ~42)
+        # Normalización idéntica a la UAM (máximo en 4.0)
         if max(y_grid) > 0:
-            y_grid = (y_grid / max(y_grid)) * 41.5
+            y_grid = (y_grid / max(y_grid)) * 4.0
 
         fig_uam = go.Figure()
         fig_uam.add_trace(go.Scatter(
             x=x_grid, 
             y=y_grid, 
             mode='lines', 
-            line=dict(color='purple', width=1.8), 
+            line=dict(color='purple', width=1.5), 
             name="Espectro"
         ))
         
@@ -234,7 +235,7 @@ with tabs[2]:
             template="plotly_white",
             height=450,
             xaxis=dict(range=[x_min_crop, x_max_crop], showgrid=True),
-            yaxis=dict(range=[0, 45], showgrid=True)
+            yaxis=dict(range=[0, 4.2], showgrid=True)
         )
         st.plotly_chart(fig_uam, use_container_width=True)
 
