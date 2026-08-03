@@ -163,7 +163,7 @@ with tabs[2]:
     col_panel, col_grafico = st.columns([1, 2.8])
     
     with col_panel:
-        st.subheader("⚙️ Parámetros de Control")
+        st.subheader("Parámetros de Control")
         mol_key = st.selectbox(
             "Seleccionar Molécula:", 
             options=list(PARAMETROS_UAM.keys()),
@@ -309,15 +309,30 @@ with tabs[3]:
     
     with col_eval1:
         st.subheader("Autoevaluación Conceptual")
-        q1 = st.radio("1. ¿Qué movimiento estudia la espectroscopía ROTACIONAL?", ["a) Vibración de enlaces", "b) Rotación de la molécula completa", "c) Movimiento de electrones", "d) Traslación"])
-        q2 = st.radio("2. En el espectro rotacional del CO, las líneas están:", ["a) A la misma frecuencia", "b) Igualmente espaciadas", "c) Más juntas a alta frecuencia", "d) Más separadas a alta frecuencia"])
-        q3 = st.radio("3. La RAMA P en el espectro IR del HCl corresponde a:", ["a) ΔJ = +1", "b) ΔJ = -1", "c) ΔJ = 0", "d) Transición electrónica"])
-        q4 = st.radio("4. Si aumentamos la temperatura:", ["a) Se desplazan a menor frecuencia", "b) Aparecen líneas con J más altos", "c) Desaparece la rama R", "d) No cambia"])
-        q5 = st.radio("5. El H³⁷Cl tiene frecuencias menores que H³⁵Cl porque:", ["a) Menor constante de fuerza", "b) Mayor masa reducida", "c) Enlace más largo", "d) Es radiactivo"])
+        q1 = st.radio(
+            "1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?", 
+            ["a) ΔJ = -1", "b) ΔJ = +1", "c) ΔJ = 0", "d) ΔJ = +2"]
+        )
+        q2 = st.radio(
+            "2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", 
+            ["a) La intensidad máxima se desplaza hacia valores de J más altos", "b) Los picos se vuelven más angostos", "c) Desaparece la rama P", "d) El origen de la banda se desplaza a mayor frecuencia"]
+        )
+        q3 = st.radio(
+            "3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?", 
+            ["a) Su constante de fuerza k es menor", "b) Tiene mayor masa reducida (μ)", "c) Su enlace es más corto", "d) Posee un momento dipolar nulo"]
+        )
+        q4 = st.radio(
+            "4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación Infrarroja (IR)?", 
+            ["a) La molécula debe ser homonuclear", "b) Debe haber un cambio en el momento dipolar durante la vibración", "c) La temperatura debe ser mayor a 500 K", "d) El momento angular orbital debe ser cero"]
+        )
+        q5 = st.radio(
+            "5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?", 
+            ["a) Los picos se separan más entre sí", "b) Las líneas se ensanchan y solapan perdiendo resolución", "c) Cambia la posición del origen de banda ν₀", "d) Aumenta la constante rotacional B"]
+        )
         
         score = 0
         if "b)" in q1: score += 20
-        if "b)" in q2: score += 20
+        if "a)" in q2: score += 20
         if "b)" in q3: score += 20
         if "b)" in q4: score += 20
         if "b)" in q5: score += 20
@@ -327,36 +342,36 @@ with tabs[3]:
 
     with col_eval2:
         st.subheader("Tabla de Resultados Experimentales")
-        st.write("Ingrese los valores obtenidos en sus experiencias simuladas:")
+        st.write("Ingrese los valores observados o calculados en las experiencias de los Módulos 2 y 3:")
 
-        v_co = st.text_input("CO — Longitud de enlace r (Å):", placeholder="Ej: 1.128")
-        v_hcl_b0 = st.text_input("HCl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.44")
-        v_hcl_b1 = st.text_input("HCl — Constante B₁ (cm⁻¹):", placeholder="Ej: 10.14")
-        v_hcl_nu0 = st.text_input("HCl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2886")
-        v_iso_b0 = st.text_input("H³⁷Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.42")
+        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2905.6")
+        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ej: 1.922")
+        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2885.3")
+        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.44")
+        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2883.8")
 
         if st.button("Verificar Tabla"):
             aciertos = 0
             try:
-                if v_co and abs(float(v_co.replace(',', '.')) - 1.128) < 0.05: aciertos += 1
-                if v_hcl_b0 and abs(float(v_hcl_b0.replace(',', '.')) - 10.44) < 0.1: aciertos += 1
-                if v_hcl_b1 and abs(float(v_hcl_b1.replace(',', '.')) - 10.14) < 0.1: aciertos += 1
-                if v_hcl_nu0 and abs(float(v_hcl_nu0.replace(',', '.')) - 2886) < 10: aciertos += 1
-                if v_iso_b0 and abs(float(v_iso_b0.replace(',', '.')) - 10.42) < 0.1: aciertos += 1
+                if v_df_nu0 and abs(float(v_df_nu0.replace(',', '.')) - 2905.6) < 3.0: aciertos += 1
+                if v_co_b0 and abs(float(v_co_b0.replace(',', '.')) - 1.922) < 0.1: aciertos += 1
+                if v_hcl_nu0 and abs(float(v_hcl_nu0.replace(',', '.')) - 2885.3) < 3.0: aciertos += 1
+                if v_h35cl_b0 and abs(float(v_h35cl_b0.replace(',', '.')) - 10.44) < 0.1: aciertos += 1
+                if v_h37cl_nu0 and abs(float(v_h37cl_nu0.replace(',', '.')) - 2883.8) < 2.0: aciertos += 1
 
                 if aciertos == 5:
-                    st.success("Todos los parámetros coinciden correctamente.")
+                    st.success("🎉 ¡Excelente! Todos los parámetros coinciden con las simulaciones.")
                 else:
-                    st.warning(f"Coinciden {aciertos} de 5 valores. Verifique sus mediciones.")
+                    st.warning(f"Coinciden {aciertos} de 5 valores. Verifique los Módulos 2 y 3.")
             except ValueError:
                 st.error("Ingrese valores numéricos válidos.")
 
     st.divider()
 
-    st.subheader("Pregunta Final")
+    st.subheader("Pregunta Final Integradora")
     respuesta_final = st.text_area(
-        "¿Por qué el CO tiene espectro rotacional pero el N₂ no? (Justifique considerando el momento dipolar):", 
-        placeholder="Escriba su respuesta aquí..."
+        "Utilizando el Simulador del Módulo 3, compara el espectro de una molécula liviana como el HF (Bₑ ≈ 20.96 cm⁻¹) frente a una pesada como el ICl (Bₑ ≈ 0.114 cm⁻¹). ¿Cómo afecta la constante rotacional Bₑ (y la masa reducida μ) al espaciado entre líneas y al ancho total del espectro?", 
+        placeholder="Escriba su respuesta analítica aquí..."
     )
 
     st.divider()
