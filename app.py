@@ -58,7 +58,6 @@ with tabs[0]:
     col1, col2 = st.columns(2)
     with col1:
         st.subheader("Configuración Inicial")
-        st.success("Entorno interactivo y librerías numéricas cargadas correctamente.")
         st.markdown("""
         En esta guía interactiva exploraremos la interacción entre la radiación electromagnética y la materia. 
         No se requiere experiencia previa en programación.
