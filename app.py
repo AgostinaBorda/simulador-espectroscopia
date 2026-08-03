@@ -66,7 +66,7 @@ with col_titulo:
 with col_logo:
     try:
         # Muestra la imagen pequeña alineada a la derecha del título
-        st.image("logos_institucionales.jpg", width=190)
+        st.image("logos_institucionales.jpg", width=250)
     except Exception:
         st.write("🏛️ **UNLPam - FCEyN**")
 
