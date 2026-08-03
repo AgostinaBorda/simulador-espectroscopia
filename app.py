@@ -15,39 +15,55 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS para pestañas recuadradas en tonos grises claros y texto siempre legible
+# Estilo CSS para pestañas recuadradas en grises sin la barra rosa de Streamlit
 st.markdown("""
 <style>
-    /* Lista de pestañas */
+    /* Contenedor general de las pestañas */
     .stTabs [role="tablist"] {
-        gap: 10px;
+        gap: 8px;
+        border-bottom: 2px solid #bbb !important;
     }
 
-    /* Pestañas inactivas (Gris claro con borde sutil) */
+    /* Pestaña Inactiva (Gris suave con borde recuadrado) */
     .stTabs [role="tab"] {
         font-size: 17px !important;
         font-weight: bold !important;
-        padding: 10px 20px !important;
-        border: 2px solid #cccccc !important;
+        padding: 10px 22px !important;
+        border: 2px solid #ccc !important;
+        border-bottom: none !important;
         border-radius: 8px 8px 0px 0px !important;
-        background-color: #f0f0f0 !important;
-        color: #333333 !important; /* Texto gris oscuro siempre visible */
-        transition: all 0.2s ease-in-out;
+        background-color: #e8e8e8 !important;
+        color: #333333 !important;
+        transition: all 0.2s ease;
     }
 
-    /* Pestaña seleccionada / activa (Gris suave destacado con borde definido) */
+    /* Pestaña Activa / Seleccionada (Gris más oscuro de contraste, sin barra rosa) */
     .stTabs [aria-selected="true"] {
-        background-color: #e0e0e0 !important;
-        color: #000000 !important; /* Texto negro */
+        background-color: #d0d0d0 !important;
+        color: #000000 !important;
         border-color: #888888 !important;
-        border-bottom: 3px solid #555555 !important;
+        border-bottom: 2px solid #d0d0d0 !important; /* Tapado del borde inferior */
     }
 
-    /* Al pasar el cursor (Hover) */
+    /* EFECTO HOVER: Al pasar el cursor */
     .stTabs [role="tab"]:hover {
-        background-color: #e5e5e5 !important;
+        background-color: #dcdcdc !important;
         color: #000000 !important;
-        border-color: #aaaaaa !important;
+    }
+
+    /* ELIMINA LA BARRA ROSA/ROJA INFERIOR DE STREAMLIT */
+    .stTabs [data-baseweb="tab-highlight"] {
+        background-color: transparent !important;
+        display: none !important;
+    }
+
+    /* RECUADRO DE CONTENIDO INTERNO (VENTANA DEL MÓDULO) EN GRIS CLARO */
+    .stTabs [role="tabpanel"] {
+        background-color: #f4f4f6 !important;
+        border: 2px solid #bbb !important;
+        border-radius: 0px 8px 8px 8px !important;
+        padding: 24px !important;
+        margin-top: -2px !important;
     }
 
     /* Ocultar elementos al imprimir */
