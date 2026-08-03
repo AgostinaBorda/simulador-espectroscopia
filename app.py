@@ -176,25 +176,47 @@ with tabs[4]:
     frec_P37 = nu0_37 - (B1_37 + B0_37)*J_P + (B1_37 - B0_37)*(J_P**2)
     frec_R37 = nu0_37 + (B1_37 + B0_37)*(J_R + 1) + (B1_37 - B0_37)*((J_R + 1)**2)
     
+    # Intensidades aproximadas
+    int_P = [1.0 / (J + 1) for J in J_P]
+    int_R = [1.0 / (J + 2) for J in J_R]
+    max_i = max(max(int_P), max(int_R))
+    int_P = np.array(int_P) / max_i
+    int_R = np.array(int_R) / max_i
+
     fig_iso = go.Figure()
     
     if mode_iso == "Individual":
-        iso_select = st.selectbox("Seleccionar Isótopo:", ["H³⁵Cl (Azul)", "H³⁷Cl (Rojo)"])
-        if "35" in iso_select:
-            for f in frec_P35: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1], mode='lines+markers', line=dict(color='blue', dash='dot'), marker=dict(color='blue')))
-            for f in frec_R35: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1], mode='lines+markers', line=dict(color='blue'), marker=dict(color='blue')))
-        else:
-            for f in frec_P37: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1], mode='lines+markers', line=dict(color='red', dash='dot'), marker=dict(color='red')))
-            for f in frec_R37: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1], mode='lines+markers', line=dict(color='red'), marker=dict(color='red')))
-    else:
-        # Superposición
-        for f in frec_P35: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue', dash='dot'), marker=dict(color='blue'), showlegend=False))
-        for f in frec_R35: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue'), marker=dict(color='blue'), showlegend=False))
+        iso_select = st.selectbox("Seleccionar Isótopo:", ["H³⁵Cl", "H³⁷Cl"])
         
-        for f in frec_P37: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red', dash='dot'), marker=dict(color='red'), showlegend=False))
-        for f in frec_R37: fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red'), marker=dict(color='red'), showlegend=False))
+        if iso_select == "H³⁵Cl":
+            for f, i_val in zip(frec_P35, int_P):
+                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='blue', width=2, dash='dot'), marker=dict(symbol='circle', color='blue'), showlegend=False))
+            for f, i_val in zip(frec_R35, int_R):
+                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
+            color_titulo = "Azul"
+        else:
+            for f, i_val in zip(frec_P37, int_P):
+                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='red', width=2, dash='dot'), marker=dict(symbol='circle', color='red'), showlegend=False))
+            for f, i_val in zip(frec_R37, int_R):
+                fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, i_val], mode='lines+markers', line=dict(color='red', width=2), marker=dict(symbol='square', color='red'), showlegend=False))
+            color_titulo = "Rojo"
+            
+        fig_iso.update_layout(title=f"Espectro de {iso_select} ({color_titulo})", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad Relativa", template="plotly_white", height=450)
+        
+    else:
+        # Modo Superposición Directa (H35Cl en azul a altura 1.0 y H37Cl en rojo a altura 0.7)
+        for f in frec_P35:
+            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue', width=2, dash='dot'), marker=dict(symbol='circle', color='blue'), showlegend=False))
+        for f in frec_R35:
+            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 1.0], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
+        
+        for f in frec_P37:
+            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red', width=2, dash='dot'), marker=dict(symbol='circle', color='red'), showlegend=False))
+        for f in frec_R37:
+            fig_iso.add_trace(go.Scatter(x=[f, f], y=[0, 0.7], mode='lines+markers', line=dict(color='red', width=2), marker=dict(symbol='square', color='red'), showlegend=False))
 
-    fig_iso.update_layout(title="Comparación del Espectro por Efecto Isotópico", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad Relativa", template="plotly_white", height=450)
+        fig_iso.update_layout(title="Comparación Isotópica Directa: H³⁵Cl (Azul) vs H³⁷Cl (Rojo - desplazado)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad (desplazada para comparar)", template="plotly_white", height=450)
+
     st.plotly_chart(fig_iso, use_container_width=True)
 
 # -----------------------------------------------------------------------------
