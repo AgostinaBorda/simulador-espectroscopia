@@ -15,10 +15,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS adaptado al modo oscuro para pestañas impecables sin barras rojas
+# Estilo CSS responsive compatible dinámicamente con Modo Claro y Modo Oscuro
 st.markdown("""
 <style>
-    /* 1. Ocultar de raíz la barra roja/rosa de Streamlit */
+    /* 1. Eliminar completamente la barra roja/rosa inferior de Streamlit */
     .stTabs [data-baseweb="tab-highlight"], 
     .stTabs [data-baseweb="tab-border"] {
         display: none !important;
@@ -27,39 +27,41 @@ st.markdown("""
 
     /* 2. Lista de pestañas */
     .stTabs [role="tablist"] {
-        gap: 10px;
-        border-bottom: 1px solid #444444 !important;
+        gap: 8px;
+        border-bottom: 2px solid rgba(128, 128, 128, 0.3) !important;
         padding-bottom: 2px;
     }
 
-    /* 3. Pestañas Inactivas (Gris oscuro con borde claro) */
+    /* 3. Pestañas Inactivas (Usan los colores secundarios del tema activo) */
     .stTabs [role="tab"] {
         font-size: 16px !important;
         font-weight: 600 !important;
         padding: 10px 20px !important;
-        border: 1px solid #555555 !important;
+        border: 1px solid rgba(128, 128, 128, 0.4) !important;
         border-radius: 8px 8px 0px 0px !important;
-        background-color: #262730 !important;
-        color: #d0d0d0 !important;
+        background-color: var(--secondary-background-color) !important;
+        color: var(--text-color) !important;
+        opacity: 0.8;
         transition: all 0.2s ease-in-out;
     }
 
-    /* 4. Pestaña Seleccionada (Gris más claro destacado con borde sutil) */
+    /* 4. Pestaña Seleccionada / Activa (Resalta con el color principal del tema) */
     .stTabs [aria-selected="true"] {
-        background-color: #3d3f4e !important;
-        color: #ffffff !important;
-        border: 1px solid #888888 !important;
-        border-bottom: 1px solid #3d3f4e !important;
+        background-color: var(--background-color) !important;
+        color: var(--text-color) !important;
+        opacity: 1.0 !important;
+        border: 2px solid rgba(128, 128, 128, 0.7) !important;
+        border-bottom: 2px solid var(--background-color) !important;
+        box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.05);
     }
 
     /* 5. Al pasar el cursor por arriba (Hover) */
     .stTabs [role="tab"]:hover {
-        background-color: #31333f !important;
-        color: #ffffff !important;
-        border-color: #aaaaaa !important;
+        opacity: 1.0 !important;
+        border-color: rgba(128, 128, 128, 0.8) !important;
     }
 
-    /* Ocultar elementos al imprimir */
+    /* Ocultar elementos en la impresión de reporte */
     @media print {
         header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
             display: none !important;
