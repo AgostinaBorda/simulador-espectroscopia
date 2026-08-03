@@ -358,18 +358,32 @@ with tabs[5]:
             st.info("Respuestas correctas: 1-b, 2-b, 3-b, 4-b, 5-b")
 
     with col_eval2:
-        st.subheader("📋 Celda 12: Tabla de Resultados")
-        st.markdown("""
-        Completa los siguientes valores obtenidos durante el laboratorio:
+        st.subheader("📋 Celda 12: Tabla de Resultados y Verificación")
+        st.write("Ingresa los valores obtenidos en tus experiencias simuladas para verificar si coinciden con la bibliografía real:")
 
-        | Molécula | Parámetro | Valor Obtenido | Valor Real |
-        | :--- | :--- | :--- | :--- |
-        | **CO** | Longitud de enlace r (Å) | `______` | **1.128 Å** |
-        | **HCl** | Constante B₀ (cm⁻¹) | `______` | **10.44 cm⁻¹** |
-        | **HCl** | Constante B₁ (cm⁻¹) | `______` | **10.14 cm⁻¹** |
-        | **HCl** | Origen de banda ν₀ (cm⁻¹) | `______` | **2886 cm⁻¹** |
-        | **H³⁷Cl** | Constante B₀ (cm⁻¹) | `______` | **10.42 cm⁻¹** |
-        """)
+        v_co = st.text_input("CO — Longitud de enlace r (Å):", placeholder="Ej: 1.128")
+        v_hcl_b0 = st.text_input("HCl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.44")
+        v_hcl_b1 = st.text_input("HCl — Constante B₁ (cm⁻¹):", placeholder="Ej: 10.14")
+        v_hcl_nu0 = st.text_input("HCl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2886")
+        v_iso_b0 = st.text_input("H³⁷Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.42")
+
+        if st.button("Verificar Tabla de Resultados"):
+            aciertos = 0
+            
+            # Verificación tolerante a pequeños decimales
+            try:
+                if v_co and abs(float(v_co.replace(',', '.')) - 1.128) < 0.05: aciertos += 1
+                if v_hcl_b0 and abs(float(v_hcl_b0.replace(',', '.')) - 10.44) < 0.1: aciertos += 1
+                if v_hcl_b1 and abs(float(v_hcl_b1.replace(',', '.')) - 10.14) < 0.1: aciertos += 1
+                if v_hcl_nu0 and abs(float(v_hcl_nu0.replace(',', '.')) - 2886) < 10: aciertos += 1
+                if v_iso_b0 and abs(float(v_iso_b0.replace(',', '.')) - 10.42) < 0.1: aciertos += 1
+
+                if aciertos == 5:
+                    st.success("🎉 ¡Excelente! Todos los parámetros coinciden perfectamente con los valores experimentales reales.")
+                else:
+                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisa tus mediciones en los Módulos 3, 4 y 5 e inténtalo de nuevo.")
+            except ValueError:
+                st.error("Por favor, ingresa números válidos en todos los campos para verificar.")
         
         st.subheader("🎯 Pregunta Final del Docente")
         st.text_area("¿Por qué el CO tiene espectro rotacional pero el N₂ no? (Pista: busca 'momento dipolar'):", placeholder="Escribe tu respuesta aquí...")
