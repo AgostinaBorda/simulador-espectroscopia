@@ -15,18 +15,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# -----------------------------------------------------------------------------
-# 1. CONFIGURACIÓN DE LA PÁGINA WEB Y ESTILOS CSS
-# -----------------------------------------------------------------------------
-st.set_page_config(
-    page_title="Laboratorio de Espectroscopía",
-    layout="wide"
-)
-
-# Estilo CSS responsive + Reglas de impresión exclusivas para el informe
+# Estilo CSS responsive compatible dinámicamente con Modo Claro y Modo Oscuro
 st.markdown("""
 <style>
-    /* 1. Ocultar la barra roja/rosa nativa de Streamlit */
+    /* 1. Eliminar completamente la barra roja/rosa inferior de Streamlit */
     .stTabs [data-baseweb="tab-highlight"], 
     .stTabs [data-baseweb="tab-border"] {
         display: none !important;
@@ -40,7 +32,7 @@ st.markdown("""
         padding-bottom: 2px;
     }
 
-    /* 3. Pestañas Inactivas */
+    /* 3. Pestañas Inactivas (Usan los colores secundarios del tema activo) */
     .stTabs [role="tab"] {
         font-size: 16px !important;
         font-weight: 600 !important;
@@ -53,41 +45,26 @@ st.markdown("""
         transition: all 0.2s ease-in-out;
     }
 
-    /* 4. Pestaña Seleccionada / Activa */
+    /* 4. Pestaña Seleccionada / Activa (Resalta con el color principal del tema) */
     .stTabs [aria-selected="true"] {
         background-color: var(--background-color) !important;
         color: var(--text-color) !important;
         opacity: 1.0 !important;
         border: 2px solid rgba(128, 128, 128, 0.7) !important;
         border-bottom: 2px solid var(--background-color) !important;
+        box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.05);
     }
 
-    /* 5. Hover */
+    /* 5. Al pasar el cursor por arriba (Hover) */
     .stTabs [role="tab"]:hover {
         opacity: 1.0 !important;
         border-color: rgba(128, 128, 128, 0.8) !important;
     }
 
-    /* ==========================================================================
-       CONFIGURACIÓN DE IMPRESIÓN (PDF LIMPIO PARA EL DOCENTE)
-       ========================================================================== */
+    /* Ocultar elementos en la impresión de reporte */
     @media print {
-        /* Ocultar encabezados, botones, menús de Streamlit y pestañas */
-        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], 
-        .stTabs [role="tablist"], button, iframe, .stButton {
+        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
             display: none !important;
-        }
-
-        /* Ocultar elementos decorativos o texto fuera del área de respuestas */
-        body {
-            background-color: #ffffff !important;
-            color: #000000 !important;
-        }
-
-        /* Forzar que el fondo del PDF sea blanco limpio */
-        [data-testid="stAppViewContainer"] {
-            background-color: #ffffff !important;
-            color: #000000 !important;
         }
     }
 </style>
