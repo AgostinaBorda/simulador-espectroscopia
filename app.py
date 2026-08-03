@@ -336,6 +336,15 @@ with tabs[4]:
 with tabs[5]:
     st.header("📝 Módulo 6: Mini-Evaluación y Entregable Final")
     
+    # Datos del estudiante para el comprobante
+    col_est1, col_est2 = st.columns(2)
+    with col_est1:
+        nombre_alumno = st.text_input("Nombre y Apellido del Estudiante:", placeholder="Ej: Agostina Borda")
+    with col_est2:
+        legajo_alumno = st.text_input("Legajo / DNI:", placeholder="Ej: 12345/6")
+
+    st.divider()
+
     col_eval1, col_eval2 = st.columns(2)
     
     with col_eval1:
@@ -346,20 +355,19 @@ with tabs[5]:
         q4 = st.radio("4️⃣ Si aumentamos la temperatura:", ["a) Se desplazan a menor frecuencia", "b) Aparecen líneas con J más altos", "c) Desaparece la rama R", "d) No cambia"])
         q5 = st.radio("5️⃣ El H³⁷Cl tiene frecuencias menores que H³⁵Cl porque:", ["a) Menor constante de fuerza", "b) Mayor masa reducida", "c) Enlace más largo", "d) Es radiactivo"])
         
-        if st.button("Verificar Respuestas"):
-            score = 0
-            if "b)" in q1: score += 20
-            if "b)" in q2: score += 20
-            if "b)" in q3: score += 20
-            if "b)" in q4: score += 20
-            if "b)" in q5: score += 20
-            
-            st.success(f"🎉 Tu calificación es: {score} / 100")
-            st.info("Respuestas correctas: 1-b, 2-b, 3-b, 4-b, 5-b")
+        score = 0
+        if "b)" in q1: score += 20
+        if "b)" in q2: score += 20
+        if "b)" in q3: score += 20
+        if "b)" in q4: score += 20
+        if "b)" in q5: score += 20
+        
+        if st.button("Verificar Calificación"):
+            st.success(f"🎉 Tu calificación actual es: {score} / 100")
 
     with col_eval2:
-        st.subheader("📋 Celda 12: Tabla de Resultados y Verificación")
-        st.write("Ingresa los valores obtenidos en tus experiencias simuladas para verificar si coinciden con la bibliografía real:")
+        st.subheader("📋 Celda 12: Tabla de Resultados")
+        st.write("Ingresa los valores obtenidos durante las simulaciones:")
 
         v_co = st.text_input("CO — Longitud de enlace r (Å):", placeholder="Ej: 1.128")
         v_hcl_b0 = st.text_input("HCl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.44")
@@ -369,8 +377,6 @@ with tabs[5]:
 
         if st.button("Verificar Tabla de Resultados"):
             aciertos = 0
-            
-            # Verificación tolerante a pequeños decimales
             try:
                 if v_co and abs(float(v_co.replace(',', '.')) - 1.128) < 0.05: aciertos += 1
                 if v_hcl_b0 and abs(float(v_hcl_b0.replace(',', '.')) - 10.44) < 0.1: aciertos += 1
@@ -379,11 +385,45 @@ with tabs[5]:
                 if v_iso_b0 and abs(float(v_iso_b0.replace(',', '.')) - 10.42) < 0.1: aciertos += 1
 
                 if aciertos == 5:
-                    st.success("🎉 ¡Excelente! Todos los parámetros coinciden perfectamente con los valores experimentales reales.")
+                    st.success("🎉 ¡Excelente! Todos los parámetros coinciden con los valores reales.")
                 else:
-                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisa tus mediciones en los Módulos 3, 4 y 5 e inténtalo de nuevo.")
+                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisa tus mediciones.")
             except ValueError:
-                st.error("Por favor, ingresa números válidos en todos los campos para verificar.")
-        
-        st.subheader("🎯 Pregunta Final del Docente")
-        st.text_area("¿Por qué el CO tiene espectro rotacional pero el N₂ no? (Pista: busca 'momento dipolar'):", placeholder="Escribe tu respuesta aquí...")
+                st.error("Por favor, ingresa números válidos.")
+
+    st.divider()
+
+    st.subheader("🎯 Pregunta Final del Docente")
+    respuesta_final = st.text_area(
+        "¿Por qué el CO tiene espectro rotacional pero el N₂ no? (Pista: busca 'momento dipolar'):", 
+        placeholder="Escribe tu respuesta aquí para incluirla en el informe final..."
+    )
+
+    st.divider()
+
+    # BOTÓN DE IMPRESIÓN PARA EL DOCENTE
+    st.subheader("🖨️ Entregable para el Docente")
+    st.write("Haz clic en el botón de abajo para abrir el panel de impresión. Podrás guardarlo como **PDF** y enviárselo a tu profesor.")
+
+    # Inyección de botón con evento de impresión en JS
+    st.components.v1.html(
+        """
+        <button onclick="window.parent.print()" style="
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        ">
+            🖨️ Imprimir / Guardar informe como PDF
+        </button>
+        """,
+        height=60
+    )
