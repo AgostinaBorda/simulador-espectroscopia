@@ -1,10 +1,6 @@
 import streamlit as st
 import math
 import plotly.graph_objects as go
-
-import streamlit as st
-import math
-import plotly.graph_objects as go
 import base64
 
 # -----------------------------------------------------------------------------
@@ -100,17 +96,6 @@ def generar_rango(inicio, fin, pasos):
     paso = (fin - inicio) / (pasos - 1)
     return [inicio + i * paso for i in range(pasos)]
 
-# Estilo CSS para vista de impresión limpia del informe
-st.markdown("""
-<style>
-@media print {
-    header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
-        display: none !important;
-    }
-}
-</style>
-""", unsafe_allow_html=True)
-
 # -----------------------------------------------------------------------------
 # 2. ENCABEZADO PRINCIPAL Y LOGO INSTITUCIONAL
 # -----------------------------------------------------------------------------
@@ -125,7 +110,6 @@ with col_titulo:
 
 with col_logo:
     try:
-        # Muestra la imagen pequeña alineada a la derecha del título
         st.image("logos_institucionales.jpg", width=250)
     except Exception:
         st.write("🏛️ **UNLPam - FCEyN**")
@@ -214,7 +198,13 @@ with tabs[1]:
         agregar_stems(fig2, frec_R37, [0.7]*len(frec_R37), 'red', dash='solid', symbol='square', name="H³⁷Cl - Rama R")
         fig2.update_layout(title="COMPARACIÓN DIRECTA: H³⁵Cl (azul) vs H³⁷Cl (rojo)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad (desplazada)")
 
-    fig2.update_layout(xaxis=dict(range=[2800, 2960]), template="plotly_white", height=450)
+    # Fondo transparente para adaptarse a cualquier tema (Light/Dark)
+    fig2.update_layout(
+        xaxis=dict(range=[2800, 2960]),
+        height=450,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
     st.plotly_chart(fig2, use_container_width=True)
 
     st.info("""
@@ -223,8 +213,6 @@ with tabs[1]:
     * La forma general del espectro es **IDÉNTICA**.
     * La constante de fuerza del enlace **NO cambia** con el isótopo.
     """)
-
-import base64
 
 # -----------------------------------------------------------------------------
 # MÓDULO 3: SIMULADOR COMPLETO (SISTEMA MATEMÁTICO UAM CON EXPORTACIÓN A PDF)
@@ -323,14 +311,16 @@ with tabs[2]:
             name='Espectro'
         ))
 
+        # Fondo transparente para evitar parpadeo blanco entre temas
         fig.update_layout(
             title=f"Espectro de Rotación-Vibración para {mol_key} (v''={v0} → v'={v1})",
             xaxis_title="Número de onda (cm⁻¹)",
             yaxis_title="Intensidad",
             xaxis=dict(range=[xmin, xmax]),
             yaxis=dict(range=[0, max_y * 1.1 if max_y > 0 else 1]),
-            template="plotly_white",
-            height=480
+            height=480,
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)'
         )
 
         st.plotly_chart(fig, use_container_width=True)
@@ -359,7 +349,6 @@ with tabs[2]:
             '''
             st.markdown(pdf_display, unsafe_allow_html=True)
         except Exception:
-            # Opción alternativa nativa si no estuviera instalado kaleido en el servidor
             st.info("💡 Sugerencia: Para descargar el gráfico en alta calidad, haz clic en el ícono de la cámara de fotos 📷 que aparece arriba a la derecha del gráfico.")
 
 # -----------------------------------------------------------------------------
