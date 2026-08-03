@@ -174,8 +174,9 @@ with tabs[2]:
         with col_v1:
             v1 = st.number_input("---> Nivel v'", min_value=0, max_value=20, value=1, step=1)
             
-        T = st.slider("Temperatura (K):", min_value=10.0, max_value=1000.0, value=298.0, step=5.0)
-        gamma = st.slider("Ancho mitad de altura (γ):", min_value=0.01, max_value=5.0, value=1.0, step=0.05)
+        # Modificados step=1.0 para Temperatura y step=0.01 para Ancho Mitad
+        T = st.slider("Temperatura (K):", min_value=10.0, max_value=1000.0, value=298.0, step=1.0)
+        gamma = st.slider("Ancho mitad de altura (γ):", min_value=0.01, max_value=5.00, value=1.00, step=0.01, format="%.2f")
         
         p = PARAMETROS_UAM[mol_key]
         B0 = obtener_B_v(v0, p)
