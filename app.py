@@ -344,11 +344,11 @@ with tabs[3]:
         st.subheader("Tabla de Resultados Experimentales")
         st.write("Ingrese los valores observados o calculados en las experiencias de los Módulos 2 y 3:")
 
-        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2905.6")
-        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ej: 1.922")
-        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2885.3")
-        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10.44")
-        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2883.8")
+        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2905,6")
+        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ej: 1,922")
+        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2885,3")
+        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10,44")
+        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2883,8")
 
         if st.button("Verificar Tabla"):
             aciertos = 0
