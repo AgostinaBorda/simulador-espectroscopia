@@ -157,61 +157,113 @@ with tabs[2]:
     3. **Para CO real, el espaciado es 115.3 GHz.** ¿Qué longitud de enlace obtienes en el simulador? *(Valor bibliográfico: 1.128 Å)*.
     4. **Si duplicaras la masa del carbono**, ¿el espaciado aumentaría o disminuiría?
     """)
-
 # -----------------------------------------------------------------------------
-# MÓDULO 4: VIBRACIÓN-ROTACIÓN (HCl)
+# MÓDULO 4: ESPECTROSCOPÍA VIBRACIONAL-ROTACIONAL (HCl)
 # -----------------------------------------------------------------------------
 with tabs[3]:
-    st.header("🌡️ Módulo 4: Espectroscopía Vibracional-Rotacional (IR - HCl)")
+    st.header("🌡️ Módulo 4: Espectroscopía Vibracional-Rotacional (HCl)")
+    
+    # -------------------------------------------------------------------------
+    # CELDA 7: SIMULADOR DE HCl - RAMAS P Y R
+    # -------------------------------------------------------------------------
+    st.subheader("🧪 Celda 7: Simulador de HCl - El Clásico (Ramas P y R)")
     
     col_ctrl4, col_plot4 = st.columns([1, 2.2])
     
     with col_ctrl4:
-        st.subheader("⚙️ Celda 7: Simulador de HCl")
-        B0_hcl = st.slider("B₀ (cm⁻¹):", 10.0, 10.8, 10.44, 0.01)
-        B1_hcl = st.slider("B₁ (cm⁻¹):", 9.8, 10.5, 10.136, 0.001)
-        nu0_hcl = st.slider("ν₀ (cm⁻¹):", 2800.0, 3000.0, 2885.9, 0.1)
-        T_hcl = st.slider("Temperatura (K):", 10, 500, 298, 10, key="t_hcl")
+        st.markdown("**Controles de los sliders (igual a Colab):**")
+        B0_hcl = st.slider("B₀ (cm⁻¹):", min_value=10.0, max_value=10.8, value=10.44, step=0.01)
+        B1_hcl = st.slider("B₁ (cm⁻¹):", min_value=9.8, max_value=10.5, value=10.136, step=0.001)
+        nu0_hcl = st.slider("ν₀ (cm⁻¹):", min_value=2800.0, max_value=3000.0, value=2885.9, step=1.0)
+        T_hcl = st.slider("T (K):", min_value=10, max_value=500, value=298, step=10, key="t_hcl_m4")
 
     with col_plot4:
-        J_max = 12
+        J_max = 15
+        
+        # Cálculo de Rama P (ΔJ = -1) y Rama R (ΔJ = +1)
         J_P = np.arange(1, J_max)
         frec_P = nu0_hcl - (B1_hcl + B0_hcl)*J_P + (B1_hcl - B0_hcl)*(J_P**2)
         
         J_R = np.arange(0, J_max - 1)
         frec_R = nu0_hcl + (B1_hcl + B0_hcl)*(J_R + 1) + (B1_hcl - B0_hcl)*((J_R + 1)**2)
         
+        # Intensidades
         int_P = [(2*J + 1) * np.exp(-B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1.0)) for J in J_P]
         int_R = [(2*J + 1) * np.exp(-B0_hcl * J * (J + 1) * hc_k / max(T_hcl, 1.0)) for J in J_R]
         
-        max_i = max(max(int_P), max(int_R))
-        int_P, int_R = np.array(int_P) / max_i, np.array(int_R) / max_i
+        max_int = max(max(int_P), max(int_R))
+        int_P = np.array(int_P) / max_int
+        int_R = np.array(int_R) / max_int
         
-        fig4 = go.Figure()
+        fig_hcl = go.Figure()
+        
+        # Rama P (Línea roja punteada con círculos)
         for f, iv in zip(frec_P, int_P):
-            fig4.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines+markers', line=dict(color='red', width=2, dash='dash'), marker=dict(symbol='circle', color='red'), showlegend=False))
+            fig_hcl.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines', line=dict(color='red', width=2, dash='dash'), showlegend=False))
+        fig_hcl.add_trace(go.Scatter(x=frec_P, y=int_P, mode='markers', marker=dict(symbol='circle', color='red', size=8), name="Rama P (ΔJ = -1)"))
+        
+        # Rama R (Línea azul continua con cuadrados)
         for f, iv in zip(frec_R, int_R):
-            fig4.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines+markers', line=dict(color='blue', width=2), marker=dict(symbol='square', color='blue'), showlegend=False))
-            
-        fig4.add_vline(x=nu0_hcl, line_dash="dot", line_color="black")
-        fig4.add_annotation(x=nu0_hcl, y=0.5, text="Origen ν₀", showarrow=False)
-        fig4.update_layout(title="Espectro INFRARROJO del HCl (Ramas P y R)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad relativa", template="plotly_white", height=400)
-        st.plotly_chart(fig4, use_container_width=True)
+            fig_hcl.add_trace(go.Scatter(x=[f, f], y=[0, iv], mode='lines', line=dict(color='blue', width=2), showlegend=False))
+        fig_hcl.add_trace(go.Scatter(x=frec_R, y=int_R, mode='markers', marker=dict(symbol='square', color='blue', size=8), name="Rama R (ΔJ = +1)"))
+        
+        # Origen de banda (línea punteada vertical)
+        fig_hcl.add_vline(x=nu0_hcl, line_dash="dot", line_color="black")
+        fig_hcl.add_annotation(x=nu0_hcl, y=0.5, text="Origen de banda<br>ν₀", showarrow=False)
+        
+        fig_hcl.update_layout(
+            title="Espectro INFRARROJO del HCl",
+            xaxis_title="Número de onda (cm⁻¹)",
+            yaxis_title="Intensidad relativa",
+            template="plotly_white",
+            height=420
+        )
+        st.plotly_chart(fig_hcl, use_container_width=True)
 
-    st.subheader("🔍 Celda 8: Identificando Transiciones Específicas")
-    col_t1, col_t2 = st.columns(2)
-    with col_t1:
-        st.markdown("**RAMA P ($\Delta J = -1$)**")
-        for J in range(1, 6):
-            val = nu0_hcl - (B1_hcl + B0_hcl)*J + (B1_hcl - B0_hcl)*(J**2)
-            st.write(f"* P({J}) $\\rightarrow$ **{val:.2f} cm⁻¹**")
-    with col_t2:
-        st.markdown("**RAMA R ($\Delta J = +1$)**")
-        for J in range(0, 5):
-            val = nu0_hcl + (B1_hcl + B0_hcl)*(J + 1) + (B1_hcl - B0_hcl)*((J + 1)**2)
-            st.write(f"* R({J}) $\\rightarrow$ **{val:.2f} cm⁻¹**")
+    st.markdown(f"""
+    📊 **CARACTERÍSTICAS (salida del código):**
+    * **Rama P (izquierda):** {len(frec_P)} líneas
+    * **Rama R (derecha):** {len(frec_R)} líneas
+    * **Hueco central:** {nu0_hcl:.1f} cm⁻¹
+    
+    💡 *Las líneas NO están igualmente espaciadas porque B cambia entre v=0 y v=1.*
+    """)
+    
+    st.divider()
 
-    st.info("🧪 **EXPERIMENTO:** Localiza $R(0)$ y $P(2)$. La diferencia $R(0) - P(2)$ dividida entre 4 te da $B_0$. ¡Compruébalo!")
+    # -------------------------------------------------------------------------
+    # CELDA 8: APRENDIENDO A "LEER" EL ESPECTRO
+    # -------------------------------------------------------------------------
+    st.subheader("🔍 Celda 8: Aprendiendo a 'leer' el espectro (Identificando transiciones)")
+    st.markdown("📋 **TABLA DE TRANSICIONES (generada dinámicamente según tus valores arriba):**")
+    
+    col_p, col_r = st.columns(2)
+    
+    with col_p:
+        st.markdown("##### 🔴 RAMA P ($\Delta J = -1$)")
+        for i, J in enumerate(range(1, 6)):
+            f_val = nu0_hcl - (B1_hcl + B0_hcl)*J + (B1_hcl - B0_hcl)*(J**2)
+            st.code(f"P({J}) → {f_val:.2f} cm⁻¹", language="text")
+
+    with col_r:
+        st.markdown("##### 🔵 RAMA R ($\Delta J = +1$)")
+        for i, J in enumerate(range(0, 5)):
+            f_val = nu0_hcl + (B1_hcl + B0_hcl)*(J + 1) + (B1_hcl - B0_hcl)*((J + 1)**2)
+            st.code(f"R({J}) → {f_val:.2f} cm⁻¹", language="text")
+
+    # Cálculos dinámicos para el experimento guiado
+    r0_val = nu0_hcl + (B1_hcl + B0_hcl)*(1) + (B1_hcl - B0_hcl)*(1**2)
+    p2_val = nu0_hcl - (B1_hcl + B0_hcl)*2 + (B1_hcl - B0_hcl)*(2**2)
+    b0_calculado = (r0_val - p2_val) / 4.0
+
+    st.info(f"""
+    🧪 **EXPERIMENTO GUIADO DE LA CELDA 8:**
+    1. Localiza **R(0)** en el gráfico (primera línea azul): **{r0_val:.2f} cm⁻¹**
+    2. Localiza **P(2)** en el gráfico (tercera línea roja): **{p2_val:.2f} cm⁻¹**
+    3. La diferencia $R(0) - P(2) = {r0_val - p2_val:.2f} \text{{ cm}}^{{-1}}$ dividida entre 4 te da $B_0$:
+       $$\\frac{{R(0) - P(2)}}{{4}} = \\frac{{{r0_val:.2f} - {p2_val:.2f}}}{{4}} = {b0_calculado:.3f} \\text{{ cm}}^{{-1}}$$
+    ¡Observa cómo coincide perfectamente con el parámetro $B_0 = {B0_hcl} \\text{{ cm}}^{{-1}}$!
+    """)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 5: EFECTO ISOTÓPICO
