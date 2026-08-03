@@ -152,8 +152,10 @@ with tabs[1]:
     * La constante de fuerza del enlace **NO cambia** con el isótopo.
     """)
 
+import base64
+
 # -----------------------------------------------------------------------------
-# MÓDULO 3: SIMULADOR COMPLETO (SISTEMA MATEMÁTICO UAM)
+# MÓDULO 3: SIMULADOR COMPLETO (SISTEMA MATEMÁTICO UAM CON EXPORTACIÓN A PDF)
 # -----------------------------------------------------------------------------
 with tabs[2]:
     st.header("Simulador de Espectros de Rotación-Vibración")
@@ -174,7 +176,6 @@ with tabs[2]:
         with col_v1:
             v1 = st.number_input("---> Nivel v'", min_value=0, max_value=20, value=1, step=1)
             
-        # Controles numéricos con botones [+] y [-] incorporados
         T = st.number_input(
             "Temperatura (K):", 
             min_value=10.0, 
@@ -260,19 +261,34 @@ with tabs[2]:
             height=480
         )
 
-        st.plotly_chart(
-            fig, 
-            use_container_width=True,
-            config={
-                'toImageButtonOptions': {
-                    'format': 'png',
-                    'filename': f'Espectro_{mol_key}_v{v0}_v{v1}',
-                    'height': 600,
-                    'width': 1000,
-                    'scale': 3
-                }
-            }
-        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        # Generación del archivo PDF en memoria
+        try:
+            pdf_bytes = fig.to_image(format="pdf", width=1000, height=600, scale=2)
+            b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
+            
+            # Enlace HTML formateado como botón para abrir el PDF en una pestaña nueva
+            pdf_display = f'''
+                <a href="data:application/pdf;base64,{b64_pdf}" target="_blank" style="text-decoration: none;">
+                    <button style="
+                        background-color: #2b5797;
+                        color: white;
+                        border: none;
+                        padding: 9px 18px;
+                        font-size: 14px;
+                        border-radius: 4px;
+                        cursor: pointer;
+                        font-weight: bold;
+                    ">
+                        📄 Abrir Espectro en PDF (Nueva pestaña)
+                    </button>
+                </a>
+            '''
+            st.markdown(pdf_display, unsafe_allow_html=True)
+        except Exception:
+            # Opción alternativa nativa si no estuviera instalado kaleido en el servidor
+            st.info("💡 Sugerencia: Para descargar el gráfico en alta calidad, haz clic en el ícono de la cámara de fotos 📷 que aparece arriba a la derecha del gráfico.")
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: EVALUACIÓN Y ENTREGABLE
