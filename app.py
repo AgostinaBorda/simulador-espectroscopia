@@ -54,11 +54,15 @@ st.markdown("""
 # -----------------------------------------------------------------------------
 # 2. ENCABEZADO PRINCIPAL Y MEMBRETE INSTITUCIONAL
 # -----------------------------------------------------------------------------
-# Carga del banner combinado (UNLPam + FCEyN)
-try:
-    st.image("logos_institucionales.jpg", use_container_width=True)
-except Exception:
-    st.write("🏛️ **Facultad de Ciencias Exactas y Naturales - UNLPam**")
+# Columnas para centrar y reducir el tamaño del logo (columna central más angosta)
+col_izq, col_logo, col_der = st.columns([1, 2, 1])
+
+with col_logo:
+    try:
+        # Se fija un ancho máximo en píxeles para que se vea discreto
+        st.image("logos_institucionales.jpg", width=350)
+    except Exception:
+        st.write("🏛️ **Facultad de Ciencias Exactas y Naturales - UNLPam**")
 
 st.divider()
 
