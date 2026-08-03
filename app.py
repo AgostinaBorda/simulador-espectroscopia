@@ -325,7 +325,7 @@ with tabs[4]:
 
     st.markdown("""
     🔬 **¿QUÉ OBSERVAS EN EL EFECTO ISOTÓPICO?**
-    * **$\text{H}^{37}\text{Cl}$ tiene MASAS más pesadas**, por lo que se desplaza ligeramente a **menores frecuencias**.
+    * **H³⁷Cl tiene MASAS más pesadas**, por lo que se desplaza ligeramente a **menores frecuencias**.
     * La forma general del espectro es **IDÉNTICA**.
     * La constante de fuerza del enlace **NO cambia** con el isótopo.
     """)
