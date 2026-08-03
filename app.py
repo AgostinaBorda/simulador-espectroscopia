@@ -15,55 +15,48 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS para pestañas recuadradas en grises sin la barra rosa de Streamlit
+# Estilo CSS adaptado al modo oscuro para pestañas impecables sin barras rojas
 st.markdown("""
 <style>
-    /* Contenedor general de las pestañas */
-    .stTabs [role="tablist"] {
-        gap: 8px;
-        border-bottom: 2px solid #bbb !important;
-    }
-
-    /* Pestaña Inactiva (Gris suave con borde recuadrado) */
-    .stTabs [role="tab"] {
-        font-size: 17px !important;
-        font-weight: bold !important;
-        padding: 10px 22px !important;
-        border: 2px solid #ccc !important;
-        border-bottom: none !important;
-        border-radius: 8px 8px 0px 0px !important;
-        background-color: #e8e8e8 !important;
-        color: #333333 !important;
-        transition: all 0.2s ease;
-    }
-
-    /* Pestaña Activa / Seleccionada (Gris más oscuro de contraste, sin barra rosa) */
-    .stTabs [aria-selected="true"] {
-        background-color: #d0d0d0 !important;
-        color: #000000 !important;
-        border-color: #888888 !important;
-        border-bottom: 2px solid #d0d0d0 !important; /* Tapado del borde inferior */
-    }
-
-    /* EFECTO HOVER: Al pasar el cursor */
-    .stTabs [role="tab"]:hover {
-        background-color: #dcdcdc !important;
-        color: #000000 !important;
-    }
-
-    /* ELIMINA LA BARRA ROSA/ROJA INFERIOR DE STREAMLIT */
-    .stTabs [data-baseweb="tab-highlight"] {
-        background-color: transparent !important;
+    /* 1. Ocultar de raíz la barra roja/rosa de Streamlit */
+    .stTabs [data-baseweb="tab-highlight"], 
+    .stTabs [data-baseweb="tab-border"] {
         display: none !important;
+        background-color: transparent !important;
     }
 
-    /* RECUADRO DE CONTENIDO INTERNO (VENTANA DEL MÓDULO) EN GRIS CLARO */
-    .stTabs [role="tabpanel"] {
-        background-color: #f4f4f6 !important;
-        border: 2px solid #bbb !important;
-        border-radius: 0px 8px 8px 8px !important;
-        padding: 24px !important;
-        margin-top: -2px !important;
+    /* 2. Lista de pestañas */
+    .stTabs [role="tablist"] {
+        gap: 10px;
+        border-bottom: 1px solid #444444 !important;
+        padding-bottom: 2px;
+    }
+
+    /* 3. Pestañas Inactivas (Gris oscuro con borde claro) */
+    .stTabs [role="tab"] {
+        font-size: 16px !important;
+        font-weight: 600 !important;
+        padding: 10px 20px !important;
+        border: 1px solid #555555 !important;
+        border-radius: 8px 8px 0px 0px !important;
+        background-color: #262730 !important;
+        color: #d0d0d0 !important;
+        transition: all 0.2s ease-in-out;
+    }
+
+    /* 4. Pestaña Seleccionada (Gris más claro destacado con borde sutil) */
+    .stTabs [aria-selected="true"] {
+        background-color: #3d3f4e !important;
+        color: #ffffff !important;
+        border: 1px solid #888888 !important;
+        border-bottom: 1px solid #3d3f4e !important;
+    }
+
+    /* 5. Al pasar el cursor por arriba (Hover) */
+    .stTabs [role="tab"]:hover {
+        background-color: #31333f !important;
+        color: #ffffff !important;
+        border-color: #aaaaaa !important;
     }
 
     /* Ocultar elementos al imprimir */
