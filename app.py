@@ -291,17 +291,17 @@ with tabs[2]:
             st.info("💡 Sugerencia: Para descargar el gráfico en alta calidad, haz clic en el ícono de la cámara de fotos 📷 que aparece arriba a la derecha del gráfico.")
 
 # -----------------------------------------------------------------------------
-# MÓDULO 4: EVALUACIÓN Y ENTREGABLE
+# MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
 # -----------------------------------------------------------------------------
 with tabs[3]:
-    st.header("Evaluación y Entregable Final")
+    st.header("Autoevaluación y Registro de Resultados")
     
     st.markdown("### Datos del Estudiante")
     col_est1, col_est2 = st.columns(2)
     with col_est1:
-        nombre_alumno = st.text_input("Nombre y Apellido:", placeholder="Ingrese su nombre completo")
+        nombre_alumno = st.text_input("Nombre y Apellido:", placeholder="Tu nombre completo")
     with col_est2:
-        legajo_alumno = st.text_input("Legajo / DNI:", placeholder="Ingrese su documento o legajo")
+        legajo_alumno = st.text_input("Legajo / DNI:", placeholder="Tu número de documento o legajo")
 
     st.divider()
 
@@ -337,20 +337,20 @@ with tabs[3]:
         if "b)" in q4: score += 20
         if "b)" in q5: score += 20
         
-        if st.button("Verificar Calificación"):
-            st.success(f"Calificación: {score} / 100")
+        if st.button("Verificar Respuestas"):
+            st.success(f"Puntaje de autoevaluación: {score} / 100")
 
     with col_eval2:
         st.subheader("Tabla de Resultados Experimentales")
-        st.write("Ingrese los valores observados o calculados en las experiencias de los Módulos 2 y 3:")
+        st.write("Registra los valores observados en las experiencias de los Módulos 2 y 3:")
 
-        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2905,6")
-        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ej: 1,922")
-        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2885,3")
-        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ej: 10,44")
-        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ej: 2883,8")
+        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
+        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
+        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
+        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
+        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
 
-        if st.button("Verificar Tabla"):
+        if st.button("Comprobar Tabla"):
             aciertos = 0
             try:
                 if v_df_nu0 and abs(float(v_df_nu0.replace(',', '.')) - 2905.6) < 3.0: aciertos += 1
@@ -360,24 +360,24 @@ with tabs[3]:
                 if v_h37cl_nu0 and abs(float(v_h37cl_nu0.replace(',', '.')) - 2883.8) < 2.0: aciertos += 1
 
                 if aciertos == 5:
-                    st.success("🎉 ¡Excelente! Todos los parámetros coinciden con las simulaciones.")
+                    st.success("🎉 ¡Excelente! Todos los valores cargados coinciden con el simulador.")
                 else:
-                    st.warning(f"Coinciden {aciertos} de 5 valores. Verifique los Módulos 2 y 3.")
+                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisa tus mediciones en los Módulos 2 y 3.")
             except ValueError:
-                st.error("Ingrese valores numéricos válidos.")
+                st.error("Por favor, ingresa únicamente valores numéricos.")
 
     st.divider()
 
-    st.subheader("Pregunta Final Integradora")
+    st.subheader("Pregunta Final")
     respuesta_final = st.text_area(
-        "Utilizando el Simulador del Módulo 3, compara el espectro de una molécula liviana como el HF (Bₑ ≈ 20.96 cm⁻¹) frente a una pesada como el ICl (Bₑ ≈ 0.114 cm⁻¹). ¿Cómo afecta la constante rotacional Bₑ (y la masa reducida μ) al espaciado entre líneas y al ancho total del espectro?", 
-        placeholder="Escriba su respuesta analítica aquí..."
+        "¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta? (Responde considerando el momento dipolar):", 
+        placeholder="Escribe tu respuesta aquí..."
     )
 
     st.divider()
 
-    st.subheader("Generación de Informe para el Docente")
-    st.write("Haga clic en el botón para imprimir o guardar como PDF el informe de la evaluación con sus datos y resultados cargados.")
+    st.subheader("Generación del Comprobante de Práctica")
+    st.write("Presiona el botón para descargar o imprimir tu hoja de autoevaluación y entregar al docente.")
 
     st.components.v1.html(
         """
@@ -392,7 +392,7 @@ with tabs[3]:
             border-radius: 4px;
             cursor: pointer;
         ">
-            Imprimir Informe de Resultados en PDF
+            Imprimir Comprobante en PDF
         </button>
         """,
         height=50
