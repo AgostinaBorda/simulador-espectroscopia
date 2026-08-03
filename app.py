@@ -52,8 +52,16 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. ENCABEZADO PRINCIPAL
+# 2. ENCABEZADO PRINCIPAL Y MEMBRETE INSTITUCIONAL
 # -----------------------------------------------------------------------------
+# Carga del banner combinado (UNLPam + FCEyN)
+try:
+    st.image("logos_institucionales.jpg", use_container_width=True)
+except Exception:
+    st.write("🏛️ **Facultad de Ciencias Exactas y Naturales - UNLPam**")
+
+st.divider()
+
 st.title("LABORATORIO DE ESPECTROSCOPÍA")
 st.markdown("""
 Bienvenido/a al mundo de las moléculas y la luz.  
