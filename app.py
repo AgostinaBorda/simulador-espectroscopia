@@ -2,13 +2,60 @@ import streamlit as st
 import math
 import plotly.graph_objects as go
 
+import streamlit as st
+import math
+import plotly.graph_objects as go
+import base64
+
 # -----------------------------------------------------------------------------
-# 1. CONFIGURACIÓN DE LA PÁGINA WEB Y CONSTANTES
+# 1. CONFIGURACIÓN DE LA PÁGINA WEB Y ESTILOS CSS PERSONALIZADOS
 # -----------------------------------------------------------------------------
 st.set_page_config(
     page_title="Laboratorio de Espectroscopía",
     layout="wide"
 )
+
+# Estilo CSS para transformar las pestañas en tarjetas recuadradas con letra más grande
+st.markdown("""
+<style>
+    /* Estilo de los botones/ventanas de las pestañas */
+    .stTabs [role="tablist"] {
+        gap: 12px;
+    }
+
+    .stTabs [role="tab"] {
+        font-size: 18px !important;
+        font-weight: bold !important;
+        padding: 12px 24px !important;
+        border: 2px solid #3b82f6 !important; /* Borde azul definido */
+        border-radius: 8px 8px 0px 0px !important; /* Recuadro redondeado en la parte superior */
+        background-color: #f8fafc !important; /* Fondo claro */
+        color: #1e293b !important; /* Texto oscuro legible */
+        transition: all 0.3s ease;
+    }
+
+    /* Estado cuando la pestaña está seleccionada / activa */
+    .stTabs [aria-selected="true"] {
+        background-color: #2563eb !important; /* Fondo azul destacado */
+        color: white !important; /* Texto blanco brillante */
+        border-color: #1d4ed8 !important;
+        box-shadow: 0px 4px 10px rgba(37, 99, 235, 0.3);
+    }
+
+    /* Efecto al pasar el cursor (hover) */
+    .stTabs [role="tab"]:hover {
+        background-color: #e2e8f0 !important;
+        border-color: #2563eb !important;
+    }
+
+    /* Ocultar elementos en la impresión de reporte */
+    @media print {
+        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
+            display: none !important;
+        }
+    }
+</style>
+""", unsafe_allow_html=True)
 
 hc_k = 1.438777  # Constante h*c/k en cm*K
 
