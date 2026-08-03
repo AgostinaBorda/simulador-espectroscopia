@@ -52,25 +52,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
-# 2. ENCABEZADO PRINCIPAL Y MEMBRETE INSTITUCIONAL
+# 2. ENCABEZADO PRINCIPAL Y LOGO INSTITUCIONAL
 # -----------------------------------------------------------------------------
-# Columnas para centrar y reducir el tamaño del logo (columna central más angosta)
-col_izq, col_logo, col_der = st.columns([1, 2, 1])
+col_titulo, col_logo = st.columns([3.5, 1.2])
+
+with col_titulo:
+    st.title("LABORATORIO DE ESPECTROSCOPÍA")
+    st.markdown("""
+    Bienvenido/a al mundo de las moléculas y la luz.  
+    En este laboratorio interactivo aprenderás cómo las moléculas rotan y vibran cuando absorben luz.
+    """)
 
 with col_logo:
     try:
-        # Se fija un ancho máximo en píxeles para que se vea discreto
-        st.image("logos_institucionales.jpg", width=350)
+        # Muestra la imagen pequeña alineada a la derecha del título
+        st.image("logos_institucionales.jpg", width=190)
     except Exception:
-        st.write("🏛️ **Facultad de Ciencias Exactas y Naturales - UNLPam**")
+        st.write("🏛️ **UNLPam - FCEyN**")
 
 st.divider()
-
-st.title("LABORATORIO DE ESPECTROSCOPÍA")
-st.markdown("""
-Bienvenido/a al mundo de las moléculas y la luz.  
-En este laboratorio interactivo aprenderás cómo las moléculas rotan y vibran cuando absorben luz.
-""")
 
 # Navegación por pestañas
 tabs = st.tabs([
