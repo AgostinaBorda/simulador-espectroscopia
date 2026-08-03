@@ -364,11 +364,11 @@ with tabs[5]:
 
         | Molécula | Parámetro | Valor Obtenido | Valor Real |
         | :--- | :--- | :--- | :--- |
-        | **CO** | Longitud de enlace $r$ (Å) | `______` | **1.128 Å** |
-        | **HCl** | Constante $B_0$ ($\text{cm}^{-1}$) | `______` | **10.44 $\text{cm}^{-1}$** |
-        | **HCl** | Constante $B_1$ ($\text{cm}^{-1}$) | `______` | **10.14 $\text{cm}^{-1}$** |
-        | **HCl** | Origen de banda $\nu_0$ ($\text{cm}^{-1}$) | `______` | **2886 $\text{cm}^{-1}$** |
-        | **H³⁷Cl** | Constante $B_0$ ($\text{cm}^{-1}$) | `______` | **10.42 $\text{cm}^{-1}$** |
+        | **CO** | Longitud de enlace r (Å) | `______` | **1.128 Å** |
+        | **HCl** | Constante B₀ (cm⁻¹) | `______` | **10.44 cm⁻¹** |
+        | **HCl** | Constante B₁ (cm⁻¹) | `______` | **10.14 cm⁻¹** |
+        | **HCl** | Origen de banda ν₀ (cm⁻¹) | `______` | **2886 cm⁻¹** |
+        | **H³⁷Cl** | Constante B₀ (cm⁻¹) | `______` | **10.42 cm⁻¹** |
         """)
         
         st.subheader("🎯 Pregunta Final del Docente")
