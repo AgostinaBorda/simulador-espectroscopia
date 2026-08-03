@@ -15,40 +15,42 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS para transformar las pestañas en tarjetas recuadradas con letra más grande
+# Estilo CSS para pestañas recuadradas en tonos grises claros y texto siempre legible
 st.markdown("""
 <style>
-    /* Estilo de los botones/ventanas de las pestañas */
+    /* Lista de pestañas */
     .stTabs [role="tablist"] {
-        gap: 12px;
+        gap: 10px;
     }
 
+    /* Pestañas inactivas (Gris claro con borde sutil) */
     .stTabs [role="tab"] {
-        font-size: 18px !important;
+        font-size: 17px !important;
         font-weight: bold !important;
-        padding: 12px 24px !important;
-        border: 2px solid #3b82f6 !important; /* Borde azul definido */
-        border-radius: 8px 8px 0px 0px !important; /* Recuadro redondeado en la parte superior */
-        background-color: #f8fafc !important; /* Fondo claro */
-        color: #1e293b !important; /* Texto oscuro legible */
-        transition: all 0.3s ease;
+        padding: 10px 20px !important;
+        border: 2px solid #cccccc !important;
+        border-radius: 8px 8px 0px 0px !important;
+        background-color: #f0f0f0 !important;
+        color: #333333 !important; /* Texto gris oscuro siempre visible */
+        transition: all 0.2s ease-in-out;
     }
 
-    /* Estado cuando la pestaña está seleccionada / activa */
+    /* Pestaña seleccionada / activa (Gris suave destacado con borde definido) */
     .stTabs [aria-selected="true"] {
-        background-color: #2563eb !important; /* Fondo azul destacado */
-        color: white !important; /* Texto blanco brillante */
-        border-color: #1d4ed8 !important;
-        box-shadow: 0px 4px 10px rgba(37, 99, 235, 0.3);
+        background-color: #e0e0e0 !important;
+        color: #000000 !important; /* Texto negro */
+        border-color: #888888 !important;
+        border-bottom: 3px solid #555555 !important;
     }
 
-    /* Efecto al pasar el cursor (hover) */
+    /* Al pasar el cursor (Hover) */
     .stTabs [role="tab"]:hover {
-        background-color: #e2e8f0 !important;
-        border-color: #2563eb !important;
+        background-color: #e5e5e5 !important;
+        color: #000000 !important;
+        border-color: #aaaaaa !important;
     }
 
-    /* Ocultar elementos en la impresión de reporte */
+    /* Ocultar elementos al imprimir */
     @media print {
         header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
             display: none !important;
