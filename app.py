@@ -11,7 +11,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS responsive compatible dinámicamente con Modo Claro y Modo Oscuro
+# Estilo CSS responsive compatible con Modo Claro y Modo Oscuro + Estilo de Impresión A4
 st.markdown("""
 <style>
     /* 1. Eliminar completamente la barra roja/rosa inferior de Streamlit */
@@ -28,7 +28,7 @@ st.markdown("""
         padding-bottom: 2px;
     }
 
-    /* 3. Pestañas Inactivas (Usan los colores secundarios del tema activo) */
+    /* 3. Pestañas Inactivas */
     .stTabs [role="tab"] {
         font-size: 16px !important;
         font-weight: 600 !important;
@@ -41,7 +41,7 @@ st.markdown("""
         transition: all 0.2s ease-in-out;
     }
 
-    /* 4. Pestaña Seleccionada / Activa (Resalta con el color principal del tema) */
+    /* 4. Pestaña Seleccionada / Activa */
     .stTabs [aria-selected="true"] {
         background-color: var(--background-color) !important;
         color: var(--text-color) !important;
@@ -51,16 +51,37 @@ st.markdown("""
         box-shadow: 0px -2px 6px rgba(0, 0, 0, 0.05);
     }
 
-    /* 5. Al pasar el cursor por arriba (Hover) */
+    /* 5. Hover */
     .stTabs [role="tab"]:hover {
         opacity: 1.0 !important;
         border-color: rgba(128, 128, 128, 0.8) !important;
     }
 
-    /* Ocultar elementos en la impresión de reporte */
+    /* ==========================================================================
+       ESTILO DE IMPRESIÓN EXCLUSIVO PARA EL ENTREGABLE (MÓDULO 4)
+       ========================================================================== */
     @media print {
-        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], .stTabs [role="tablist"] {
+        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], 
+        .stTabs [role="tablist"], button, iframe, .stButton, .custom-footer {
             display: none !important;
+        }
+
+        body, [data-testid="stAppViewContainer"] {
+            background-color: #ffffff !important;
+            color: #000000 !important;
+            font-family: Arial, sans-serif !important;
+        }
+
+        input, textarea {
+            border: none !important;
+            border-bottom: 1px solid #000 !important;
+            background: transparent !important;
+            color: #000 !important;
+        }
+
+        @page {
+            margin: 1.5cm;
+            size: A4 portrait;
         }
     }
 </style>
@@ -123,29 +144,6 @@ tabs = st.tabs([
     "Módulo 3: Simulador de Espectros de Rotación-Vibración",
     "Módulo 4: Autoevaluación"
 ])
-
-# -----------------------------------------------------------------------------
-# 3. FOOTER O PIE DE PÁGINA
-# -----------------------------------------------------------------------------
-st.markdown("""
-<style>
-    .custom-footer {
-        text-align: center;
-        padding: 18px;
-        margin-top: 40px;
-        border-top: 1px solid rgba(128, 128, 128, 0.3);
-        color: var(--text-color);
-        opacity: 0.85;
-        font-size: 13.5px;
-        font-weight: 500;
-        line-height: 1.5;
-    }
-</style>
-<div class="custom-footer">
-    Creado por Agostina Borda y Germán Morazzo<br>
-    © 2026 — Todos los derechos reservados.
-</div>
-""", unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 1: INTRODUCCIÓN
@@ -357,7 +355,7 @@ with tabs[2]:
     with col_grafico:
         st.plotly_chart(fig, use_container_width=True)
 
-        # Centrado del botón debajo de la gráfica (3 columnas: izquierda, centro, derecha)
+        # Centrado del botón debajo de la gráfica
         col_izq, col_medio, col_der = st.columns([1, 1, 1])
         with col_medio:
             try:
@@ -370,7 +368,7 @@ with tabs[2]:
                     use_container_width=True
                 )
             except Exception:
-                st.caption("💡 Descargá el gráfico en PDF con el botón 'Generar espectro en PDF' o en PNG usando el ícono de la cámara 📷 arriba a la derecha del gráfico.")
+                st.caption("💡 Descargá el gráfico en PNG usando el ícono de la cámara 📷 arriba a la derecha del gráfico.")
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
@@ -479,3 +477,26 @@ with tabs[3]:
         """,
         height=50
     )
+
+# -----------------------------------------------------------------------------
+# 3. FOOTER O PIE DE PÁGINA (Al final para que aparezca abajo de los módulos)
+# -----------------------------------------------------------------------------
+st.markdown("""
+<style>
+    .custom-footer {
+        text-align: center;
+        padding: 18px;
+        margin-top: 40px;
+        border-top: 1px solid rgba(128, 128, 128, 0.3);
+        color: var(--text-color);
+        opacity: 0.85;
+        font-size: 13.5px;
+        font-weight: 500;
+        line-height: 1.5;
+    }
+</style>
+<div class="custom-footer">
+    Creado por Agostina Borda y Germán Morazzo<br>
+    © 2026 — Todos los derechos reservados.
+</div>
+""", unsafe_allow_html=True)
