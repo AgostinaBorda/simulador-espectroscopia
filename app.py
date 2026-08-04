@@ -11,10 +11,10 @@ st.set_page_config(
     layout="wide"
 )
 
-# Estilo CSS responsive compatible con Modo Claro y Modo Oscuro + Estilo de Impresión A4
+# Estilo CSS responsive compatible con Modo Claro y Modo Oscuro
 st.markdown("""
 <style>
-    /* 1. Eliminar completamente la barra roja/rosa inferior de Streamlit */
+    /* 1. Eliminar la barra de Streamlit */
     .stTabs [data-baseweb="tab-highlight"], 
     .stTabs [data-baseweb="tab-border"] {
         display: none !important;
@@ -58,25 +58,20 @@ st.markdown("""
     }
 
     /* ==========================================================================
-       ESTILO DE IMPRESIÓN EXCLUSIVO PARA EL ENTREGABLE (MÓDULO 4)
+       ESTILO DE IMPRESIÓN EXCLUSIVO PARA EL REPORTES
        ========================================================================== */
     @media print {
         header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], 
-        .stTabs [role="tablist"], button, iframe, .stButton, .custom-footer {
+        .stTabs [role="tablist"], .custom-footer, .no-print {
             display: none !important;
         }
 
-        body, [data-testid="stAppViewContainer"] {
-            background-color: #ffffff !important;
+        .reporte-impresion {
+            display: block !important;
             color: #000000 !important;
+            background: #ffffff !important;
             font-family: Arial, sans-serif !important;
-        }
-
-        input, textarea {
-            border: none !important;
-            border-bottom: 1px solid #000 !important;
-            background: transparent !important;
-            color: #000 !important;
+            padding: 20px;
         }
 
         @page {
@@ -222,7 +217,6 @@ with tabs[1]:
         agregar_stems(fig2, frec_R37, [0.7]*len(frec_R37), 'red', dash='solid', symbol='square', name="H³⁷Cl - Rama R")
         fig2.update_layout(title="COMPARACIÓN DIRECTA: H³⁵Cl (azul) vs H³⁷Cl (rojo)", xaxis_title="Número de onda (cm⁻¹)", yaxis_title="Intensidad (desplazada)")
 
-    # Fondo transparente para adaptarse a cualquier tema (Light/Dark)
     fig2.update_layout(
         xaxis=dict(range=[2800, 2960]),
         height=450,
@@ -239,7 +233,7 @@ with tabs[1]:
     """)
 
 # -----------------------------------------------------------------------------
-# MÓDULO 3: SIMULADOR COMPLETO (SISTEMA CON BOTÓN ENVIAR Y EXPORTACIÓN PDF)
+# MÓDULO 3: SIMULADOR COMPLETO
 # -----------------------------------------------------------------------------
 with tabs[2]:
     st.header("Simulador de Espectros de Rotación-Vibración")
@@ -247,7 +241,6 @@ with tabs[2]:
     col_panel, col_grafico = st.columns([1, 2.8])
     
     with col_panel:
-        # Formulario estilo UAM
         with st.form(key="form_simulador_uam"):
             st.subheader("Parámetros de Control")
             
@@ -283,7 +276,6 @@ with tabs[2]:
             
             btn_enviar = st.form_submit_button("Enviar")
 
-        # Cálculos de constantes
         p = PARAMETROS_UAM[mol_key]
         B0 = obtener_B_v(v0, p)
         B1 = obtener_B_v(v1, p)
@@ -296,11 +288,9 @@ with tabs[2]:
         * $\\nu_0 = {nu0:.1f}\\text{{ cm}}^{{-1}}$
         """)
 
-    # Cálculos matemáticos del espectro
     J_max = 40
     lineas_frec, lineas_int = [], []
 
-    # Rama P (ΔJ = -1)
     for J in range(1, J_max):
         frec = nu0 - (B1 + B0)*J + (B1 - B0)*(J**2)
         pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
@@ -308,7 +298,6 @@ with tabs[2]:
             lineas_frec.append(frec)
             lineas_int.append(pob)
 
-    # Rama R (ΔJ = +1)
     for J in range(0, J_max):
         frec = nu0 + (B1 + B0)*(J + 1) + (B1 - B0)*((J + 1)**2)
         pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
@@ -355,7 +344,6 @@ with tabs[2]:
     with col_grafico:
         st.plotly_chart(fig, use_container_width=True)
 
-        # Centrado del botón debajo de la gráfica
         col_izq, col_medio, col_der = st.columns([1, 1, 1])
         with col_medio:
             try:
@@ -456,8 +444,45 @@ with tabs[3]:
 
     st.divider()
 
+    # BLOQUE DE REPORTE LIMPIO PARA IMPRESIÓN PDF
     st.subheader("Generación del Comprobante de Práctica")
     st.write("Presiona el botón para descargar o imprimir tu hoja de autoevaluación y entregar al docente.")
+
+    html_reporte = f"""
+    <div class="reporte-impresion" style="display:none;">
+        <h2 style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 8px;">UNLPam - FCEyN | Laboratorio de Espectroscopía</h2>
+        <h3 style="text-align:center; margin-top: 5px;">Comprobante de Práctica y Autoevaluación</h3>
+        <br>
+        <p><strong>Estudiante:</strong> {nombre_alumno if nombre_alumno else "--------------------"}</p>
+        <p><strong>Legajo / DNI:</strong> {legajo_alumno if legajo_alumno else "--------------------"}</p>
+        <hr>
+        <h4>1. Respuestas de Autoevaluación Conceptual</h4>
+        <ul>
+            <li><strong>Pregunta 1 (Rama R):</strong> {q1}</li>
+            <li><strong>Pregunta 2 (Temperatura):</strong> {q2}</li>
+            <li><strong>Pregunta 3 (Isótopos):</strong> {q3}</li>
+            <li><strong>Pregunta 4 (Condición IR):</strong> {q4}</li>
+            <li><strong>Pregunta 5 (Ancho γ):</strong> {q5}</li>
+        </ul>
+        <p><strong>Puntaje Obtenido:</strong> {score} / 100</p>
+        <hr>
+        <h4>2. Tabla de Resultados Experimentales</h4>
+        <ul>
+            <li><strong>DF ν₀:</strong> {v_df_nu0 if v_df_nu0 else "Sin responder"}</li>
+            <li><strong>CO B₀:</strong> {v_co_b0 if v_co_b0 else "Sin responder"}</li>
+            <li><strong>HCl ν₀:</strong> {v_hcl_nu0 if v_hcl_nu0 else "Sin responder"}</li>
+            <li><strong>H³⁵Cl B₀:</strong> {v_h35cl_b0 if v_h35cl_b0 else "Sin responder"}</li>
+            <li><strong>H³⁷Cl ν₀:</strong> {v_h37cl_nu0 if v_h37cl_nu0 else "Sin responder"}</li>
+        </ul>
+        <hr>
+        <h4>3. Respuesta Conceptual Final</h4>
+        <p style="border: 1px solid #ccc; padding: 10px; min-height: 80px;">
+            {respuesta_final if respuesta_final else "Sin respuesta ingresada."}
+        </p>
+    </div>
+    """
+    
+    st.markdown(html_reporte, unsafe_allow_html=True)
 
     st.components.v1.html(
         """
@@ -479,7 +504,7 @@ with tabs[3]:
     )
 
 # -----------------------------------------------------------------------------
-# 3. FOOTER O PIE DE PÁGINA (Al final para que aparezca abajo de los módulos)
+# 3. FOOTER O PIE DE PÁGINA
 # -----------------------------------------------------------------------------
 st.markdown("""
 <style>
