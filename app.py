@@ -162,7 +162,7 @@ with tabs[0]:
         En este laboratorio interactivo abordarás el comportamiento rotacional y vibracional de moléculas diatómicas a través de los siguientes ejes:
         * **Efecto Isotópico:** Análisis de los cambios en la masa reducida y en las frecuencias de absorción (comparación $H^{35}Cl$ vs $H^{37}Cl$).
         * **Simulación de Espectros de Rotación-Vibración:** Modelado interactivo de bandas (ramas P y R), evaluando el efecto de la temperatura, la constante rotacional y los niveles cuánticos.
-        * **Autoevaluación:** Verificación de conceptos clave y consolidación de datos experimentales.
+        * **Evaluación y Registro:** Verificación de conceptos clave y consolidación de datos experimentales.
         """)
 
     with col2:
@@ -173,7 +173,7 @@ with tabs[0]:
         st.latex(r"k = 1.381 \times 10^{-23} \text{ J/K} \quad (\text{Constante de Boltzmann})")
 
     st.info("""
-    💡 **¿Sabías que?** Estas constantes fundamentales permiten transformar las transiciones de energía cuántica entre niveles discretos en frecuencias y números de onda ($\text{cm}^{-1}$) directamente medibles en un espectrómetro.
+    💡 **¿Sabías que?** Estas constantes fundamentales permiten transformar las transiciones de energía cuántica entre niveles discretos en frecuencias y números de onda (cm⁻¹) directamente medibles en un espectrómetro.
     """)
 
 # -----------------------------------------------------------------------------
