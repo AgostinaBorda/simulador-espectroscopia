@@ -125,6 +125,27 @@ tabs = st.tabs([
 ])
 
 # -----------------------------------------------------------------------------
+# 3. FOOTER O PIE DE PÁGINA
+# -----------------------------------------------------------------------------
+st.markdown("""
+<style>
+    .custom-footer {
+        text-align: center;
+        padding: 16px;
+        margin-top: 40px;
+        border-top: 1px solid rgba(128, 128, 128, 0.3);
+        color: var(--text-color);
+        opacity: 0.8;
+        font-size: 14px;
+        font-weight: 500;
+    }
+</style>
+<div class="custom-footer">
+    Creado por Agostina Borda y Germán Morazzo
+</div>
+""", unsafe_allow_html=True)
+
+# -----------------------------------------------------------------------------
 # MÓDULO 1: INTRODUCCIÓN
 # -----------------------------------------------------------------------------
 with tabs[0]:
