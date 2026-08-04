@@ -155,22 +155,25 @@ with tabs[0]:
     
     col1, col2 = st.columns(2)
     with col1:
-        st.subheader("Configuración Inicial")
+        st.subheader("Fundamentos del Laboratorio")
         st.markdown("""
-        En esta guía interactiva exploraremos la interacción entre la radiación electromagnética y la materia. 
-        No se requiere experiencia previa en programación.
+        La **espectroscopía** estudia la interacción entre la radiación electromagnética y la materia, permitiendo deducir la estructura, geometría y transiciones de energía en átomos y moléculas.
+        
+        En este laboratorio interactivo abordarás el comportamiento rotacional y vibracional de moléculas diatómicas a través de los siguientes ejes:
+        * **Efecto Isotópico:** Análisis de los cambios en la masa reducida y en las frecuencias de absorción (comparación $H^{35}Cl$ vs $H^{37}Cl$).
+        * **Simulación de Espectros de Rotación-Vibración:** Modelado interactivo de bandas (ramas P y R), evaluando el efecto de la temperatura, la constante rotacional y los niveles cuánticos.
+        * **Autoevaluación:** Verificación de conceptos clave y consolidación de datos experimentales.
         """)
 
     with col2:
         st.subheader("Constantes Fundamentales")
-        st.write("Valores universales de la naturaleza:")
+        st.write("Valores universales empleados en la modelización de las energías cuánticas:")
         st.latex(r"h = 6.626 \times 10^{-34} \text{ J}\cdot\text{s} \quad (\text{Constante de Planck})")
         st.latex(r"c = 2.998 \times 10^{10} \text{ cm/s} \quad (\text{Velocidad de la luz})")
         st.latex(r"k = 1.381 \times 10^{-23} \text{ J/K} \quad (\text{Constante de Boltzmann})")
 
     st.info("""
-    💡 **¿Sabías que?** Estas constantes aparecen en las ecuaciones porque la espectroscopía es cuantitativa y cuántica. 
-    Los intercambios de energía ocurren en paquetes discretos llamados cuantos.
+    💡 **¿Sabías que?** Estas constantes fundamentales permiten transformar las transiciones de energía cuántica entre niveles discretos en frecuencias y números de onda ($\text{cm}^{-1}$) directamente medibles en un espectrómetro.
     """)
 
 # -----------------------------------------------------------------------------
