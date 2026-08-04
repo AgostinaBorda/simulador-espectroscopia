@@ -460,21 +460,20 @@ with tabs[3]:
         story.append(Paragraph("<b>UNLPam - FCEyN | Laboratorio de Espectroscopía</b>", title_style))
         story.append(Paragraph("Comprobante de Práctica y Autoevaluación", subtitle_style))
 
-        # Datos Alumno (Usando Paragraph para procesar <b> correctamente)
+        # Datos Alumno (2 columnas centradas)
         nom = nombre_alumno if nombre_alumno else "--------------------"
         leg = legajo_alumno if legajo_alumno else "--------------------"
         
         celda_est = Paragraph(f"<b>Estudiante:</b> {nom}", text_style)
         celda_leg = Paragraph(f"<b>Legajo/DNI:</b> {leg}", text_style)
-        celda_pts = Paragraph(f"<b>Puntaje Teórico:</b> {score}/100 pts", text_style)
         
-        tabla_datos = Table([[celda_est, celda_leg, celda_pts]], colWidths=[220, 180, 140])
+        tabla_datos = Table([[celda_est, celda_leg]], colWidths=[280, 260])
         tabla_datos.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
         story.append(tabla_datos)
         story.append(Spacer(1, 8))
 
-        # 1. Autoevaluación Conceptual (Sin puntajes individuales por consigna)
-        story.append(Paragraph("1. Autoevaluación Conceptual", h2_style))
+        # 1. Autoevaluación Conceptual (Puntaje en el título)
+        story.append(Paragraph(f"1. Autoevaluación Conceptual (Puntaje: {score}/100 pts)", h2_style))
         preguntas = [
             ("1. ¿A qué cambio en el número cuántico rotacional (&Delta;J) corresponde la Rama R?", opts_q1, q1),
             ("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2, q2),
@@ -505,7 +504,7 @@ with tabs[3]:
             pass
         score_exp = aciertos_exp * 20
 
-        # 2. Tabla de Resultados (Con puntaje alcanzado incluido)
+        # 2. Tabla de Resultados (Puntaje en el título)
         story.append(Paragraph(f"2. Tabla de Resultados Experimentales (Puntaje: {score_exp}/100 pts)", h2_style))
         story.append(Paragraph(f"• <b>DF (v''=0 &rarr; v'=1) &mdash; Origen v<sub>0</sub>:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
         story.append(Paragraph(f"• <b>CO (v''=0) &mdash; Constante B<sub>0</sub>:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
