@@ -354,19 +354,20 @@ with tabs[2]:
     with col_grafico:
         st.plotly_chart(fig, use_container_width=True)
 
-        # Ubicación abajo a la derecha de la gráfica
-        _, col_pdf_derecha = st.columns([3, 1])
-        with col_pdf_derecha:
+        # Centrado del botón debajo de la gráfica (3 columnas: izquierda, centro, derecha)
+        col_izq, col_medio, col_der = st.columns([1, 1, 1])
+        with col_medio:
             try:
                 pdf_bytes = fig.to_image(format="pdf", width=900, height=600, scale=2)
                 st.download_button(
-                    label="Espectro en pdf",
+                    label="📄 Espectro en pdf",
                     data=pdf_bytes,
                     file_name=f"Espectro_{mol_key}.pdf",
-                    mime="application/pdf"
+                    mime="application/pdf",
+                    use_container_width=True
                 )
             except Exception:
-                st.caption("💡 Descarga el gráfico usando el ícono de la cámara 📷 arriba a la derecha.")
+                st.caption("💡 Descargá el gráfico en PDF con el botón 'Generar espectro en PDF' o en PNG usando el ícono de la cámara 📷 arriba a la derecha del gráfico.")
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
