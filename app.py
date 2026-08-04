@@ -162,7 +162,7 @@ with tabs[0]:
         En este laboratorio interactivo abordarás el comportamiento rotacional y vibracional de moléculas diatómicas a través de los siguientes ejes:
         * **Efecto Isotópico:** Análisis de los cambios en la masa reducida y en las frecuencias de absorción (comparación $H^{35}Cl$ vs $H^{37}Cl$).
         * **Simulación de Espectros de Rotación-Vibración:** Modelado interactivo de bandas (ramas P y R), evaluando el efecto de la temperatura, la constante rotacional y los niveles cuánticos.
-        * **Evaluación y Registro:** Verificación de conceptos clave y consolidación de datos experimentales.
+        * **Autoevaluación:** Verificación de conceptos clave y consolidación de datos experimentales.
         """)
 
     with col2:
