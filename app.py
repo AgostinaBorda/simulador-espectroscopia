@@ -246,7 +246,7 @@ with tabs[2]:
     col_panel, col_grafico = st.columns([1, 2.8])
     
     with col_panel:
-        # Formulario estilo UAM: no recalcula la gráfica hasta presionar "Enviar"
+        # Formulario estilo UAM
         with st.form(key="form_simulador_uam"):
             st.subheader("Parámetros de Control")
             
@@ -354,31 +354,19 @@ with tabs[2]:
     with col_grafico:
         st.plotly_chart(fig, use_container_width=True)
 
-    # Generación y descarga directa del archivo PDF exclusivo de la gráfica
-    with col_panel:
-        try:
-            # Convierte la figura de Plotly directamente a bytes en formato PDF vectorizado
-            pdf_bytes = fig.to_image(format="pdf", width=900, height=600, scale=2)
-            
-            st.download_button(
-                label="Espectro en pdf",
-                data=pdf_bytes,
-                file_name=f"Espectro_{mol_key}.pdf",
-                mime="application/pdf"
-            )
-        except Exception:
-            # Alternativa visual si kaleido no responde en el servidor
-            st.markdown(f'''
-                <a href="#" onclick="const img = document.querySelector('.js-plotly-plot'); window.print(); return false;" style="
-                    color: #1a73e8;
-                    font-size: 16px;
-                    font-weight: 500;
-                    text-decoration: underline;
-                    font-family: sans-serif;
-                ">
-                    Espectro en pdf
-                </a>
-            ''', unsafe_allow_html=True)
+        # Ubicación abajo a la derecha de la gráfica
+        _, col_pdf_derecha = st.columns([3, 1])
+        with col_pdf_derecha:
+            try:
+                pdf_bytes = fig.to_image(format="pdf", width=900, height=600, scale=2)
+                st.download_button(
+                    label="Espectro en pdf",
+                    data=pdf_bytes,
+                    file_name=f"Espectro_{mol_key}.pdf",
+                    mime="application/pdf"
+                )
+            except Exception:
+                st.caption("💡 Descarga el gráfico usando el ícono de la cámara 📷 arriba a la derecha.")
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
