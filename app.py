@@ -460,45 +460,61 @@ with tabs[3]:
         story.append(Paragraph("<b>UNLPam - FCEyN | Laboratorio de Espectroscopía</b>", title_style))
         story.append(Paragraph("Comprobante de Práctica y Autoevaluación", subtitle_style))
 
-        # Cuadro de Datos del Alumno
+        # Datos Alumno (Usando Paragraph para procesar <b> correctamente)
         nom = nombre_alumno if nombre_alumno else "--------------------"
         leg = legajo_alumno if legajo_alumno else "--------------------"
-        tabla_datos = Table([[f"<b>Estudiante:</b> {nom}", f"<b>Legajo/DNI:</b> {leg}", f"<b>Puntaje:</b> {score}/100 pts"]], colWidths=[220, 180, 140])
-        tabla_datos.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTSIZE', (0,0), (-1,-1), 10)]))
+        
+        celda_est = Paragraph(f"<b>Estudiante:</b> {nom}", text_style)
+        celda_leg = Paragraph(f"<b>Legajo/DNI:</b> {leg}", text_style)
+        celda_pts = Paragraph(f"<b>Puntaje Teórico:</b> {score}/100 pts", text_style)
+        
+        tabla_datos = Table([[celda_est, celda_leg, celda_pts]], colWidths=[220, 180, 140])
+        tabla_datos.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE')]))
         story.append(tabla_datos)
         story.append(Spacer(1, 8))
 
-        # Section 1: Autoevaluación Conceptual
+        # 1. Autoevaluación Conceptual (Sin puntajes individuales por consigna)
         story.append(Paragraph("1. Autoevaluación Conceptual", h2_style))
         preguntas = [
-            ("1. ¿A qué cambio en el número cuántico rotacional (&Delta;J) corresponde la Rama R?", opts_q1, q1, p1),
-            ("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2, q2, p2),
-            ("3. En la comparación de H<sup>35</sup>Cl y H<sup>37</sup>Cl (Módulo 2), ¿por qué H<sup>37</sup>Cl absorbe a menores números de onda?", opts_q3, q3, p3),
-            ("4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación IR?", opts_q4, q4, p4),
-            ("5. Al incrementar el Ancho mitad de altura (&gamma;), ¿qué efecto se observa en las bandas?", opts_q5, q5, p5)
+            ("1. ¿A qué cambio en el número cuántico rotacional (&Delta;J) corresponde la Rama R?", opts_q1, q1),
+            ("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2, q2),
+            ("3. En la comparación de H<sup>35</sup>Cl y H<sup>37</sup>Cl (Módulo 2), ¿por qué H<sup>37</sup>Cl absorbe a menores números de onda?", opts_q3, q3),
+            ("4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación IR?", opts_q4, q4),
+            ("5. Al incrementar el Ancho mitad de altura (&gamma;), ¿qué efecto se observa en las bandas?", opts_q5, q5)
         ]
 
-        for tit, opts, sel, pts in preguntas:
-            story.append(Paragraph(f"<b>{tit}</b> (Puntos: {pts}/20)", text_style))
+        for tit, opts, sel in preguntas:
+            story.append(Paragraph(f"<b>{tit}</b>", text_style))
             for o in opts:
-                # Formatear superíndices para ReportLab
-                o_clean = o.replace("H³⁵Cl", "H<sup>35</sup>Cl").replace("H³⁷Cl", "H<sup>37</sup>Cl")
+                o_clean = o.replace("H³⁵Cl", "H<sup>35</sup>Cl").replace("H³⁷Cl", "H<sup>37</sup>Cl").replace("ν₀", "v<sub>0</sub>")
                 if o == sel:
                     story.append(Paragraph(f"<b>[ X ] {o_clean}</b> (Seleccionada)", opt_sel_style))
                 else:
                     story.append(Paragraph(f"[ &nbsp; ] {o_clean}", opt_style))
             story.append(Spacer(1, 3))
 
-        # Section 2: Tabla de Resultados
-        story.append(Paragraph("2. Tabla de Resultados Experimentales", h2_style))
-        story.append(Paragraph(f"• <b>DF (v''=0 &rarr; v'=1) &mdash; Origen &nu;<sub>0</sub>:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
+        # Cálculo de aciertos experimentales
+        aciertos_exp = 0
+        try:
+            if v_df_nu0 and abs(float(v_df_nu0.replace(',', '.')) - 2905.6) < 3.0: aciertos_exp += 1
+            if v_co_b0 and abs(float(v_co_b0.replace(',', '.')) - 1.922) < 0.1: aciertos_exp += 1
+            if v_hcl_nu0 and abs(float(v_hcl_nu0.replace(',', '.')) - 2885.3) < 3.0: aciertos_exp += 1
+            if v_h35cl_b0 and abs(float(v_h35cl_b0.replace(',', '.')) - 10.44) < 0.1: aciertos_exp += 1
+            if v_h37cl_nu0 and abs(float(v_h37cl_nu0.replace(',', '.')) - 2883.8) < 2.0: aciertos_exp += 1
+        except ValueError:
+            pass
+        score_exp = aciertos_exp * 20
+
+        # 2. Tabla de Resultados (Con puntaje alcanzado incluido)
+        story.append(Paragraph(f"2. Tabla de Resultados Experimentales (Puntaje: {score_exp}/100 pts)", h2_style))
+        story.append(Paragraph(f"• <b>DF (v''=0 &rarr; v'=1) &mdash; Origen v<sub>0</sub>:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
         story.append(Paragraph(f"• <b>CO (v''=0) &mdash; Constante B<sub>0</sub>:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>HCl (v''=0 &rarr; v'=1) &mdash; Origen &nu;<sub>0</sub>:</b> {v_hcl_nu0 if v_hcl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>HCl (v''=0 &rarr; v'=1) &mdash; Origen v<sub>0</sub>:</b> {v_hcl_nu0 if v_hcl_nu0 else 'Sin registrar'}", text_style))
         story.append(Paragraph(f"• <b>H<sup>35</sup>Cl &mdash; Constante B<sub>0</sub>:</b> {v_h35cl_b0 if v_h35cl_b0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>H<sup>37</sup>Cl &mdash; Origen &nu;<sub>0</sub>:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>H<sup>37</sup>Cl &mdash; Origen v<sub>0</sub>:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
         story.append(Spacer(1, 4))
 
-        # Section 3: Pregunta Final
+        # 3. Pregunta Final
         story.append(Paragraph("3. Pregunta Conceptual Final", h2_style))
         story.append(Paragraph("<b>Consigna:</b> ¿Por qué el CO presenta espectro rotacional mientras que el N<sub>2</sub> no lo presenta?", text_style))
         resp = respuesta_final if respuesta_final else "Sin respuesta ingresada."
