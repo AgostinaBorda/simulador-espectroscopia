@@ -2,6 +2,11 @@ import streamlit as st
 import math
 import plotly.graph_objects as go
 import base64
+import io
+from reportlab.lib.pagesizes import letter
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
 
 # -----------------------------------------------------------------------------
 # 1. CONFIGURACIÓN DE LA PÁGINA WEB Y ESTILOS CSS PERSONALIZADOS
@@ -14,7 +19,7 @@ st.set_page_config(
 # Estilo CSS responsive compatible con Modo Claro y Modo Oscuro
 st.markdown("""
 <style>
-    /* 1. Eliminar la barra de Streamlit */
+    /* 1. Eliminar completamente la barra inferior de Streamlit */
     .stTabs [data-baseweb="tab-highlight"], 
     .stTabs [data-baseweb="tab-border"] {
         display: none !important;
@@ -55,29 +60,6 @@ st.markdown("""
     .stTabs [role="tab"]:hover {
         opacity: 1.0 !important;
         border-color: rgba(128, 128, 128, 0.8) !important;
-    }
-
-    /* ==========================================================================
-       ESTILO DE IMPRESIÓN EXCLUSIVO PARA EL REPORTES
-       ========================================================================== */
-    @media print {
-        header, footer, [data-testid="stSidebar"], [data-testid="stHeader"], 
-        .stTabs [role="tablist"], .custom-footer, .no-print {
-            display: none !important;
-        }
-
-        .reporte-impresion {
-            display: block !important;
-            color: #000000 !important;
-            background: #ffffff !important;
-            font-family: Arial, sans-serif !important;
-            padding: 20px;
-        }
-
-        @page {
-            margin: 1.5cm;
-            size: A4 portrait;
-        }
     }
 </style>
 """, unsafe_allow_html=True)
@@ -375,7 +357,6 @@ with tabs[3]:
 
     col_eval1, col_eval2 = st.columns(2)
     
-    # Opciones de las preguntas
     opts_q1 = ["a) ΔJ = -1", "b) ΔJ = +1", "c) ΔJ = 0", "d) ΔJ = +2"]
     opts_q2 = ["a) La intensidad máxima se desplaza hacia valores de J más altos", "b) Los picos se vuelven más angostos", "c) Desaparece la rama P", "d) El origen de la banda se desplaza a mayor frecuencia"]
     opts_q3 = ["a) Su constante de fuerza k es menor", "b) Tiene mayor masa reducida (μ)", "c) Su enlace es más corto", "d) Posee un momento dipolar nulo"]
@@ -402,13 +383,13 @@ with tabs[3]:
 
     with col_eval2:
         st.subheader("Tabla de Resultados Experimentales")
-        st.write("Registra los valores observados en las experiencias de los Módulos 2 y 3:")
+        st.write("Registrá los valores observados en las experiencias de los Módulos 2 y 3:")
 
-        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
-        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
-        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
-        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
-        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresa el valor obtenido")
+        v_df_nu0 = st.text_input("DF (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresá el valor obtenido")
+        v_co_b0 = st.text_input("CO (v''=0) — Constante B₀ (cm⁻¹):", placeholder="Ingresá el valor obtenido")
+        v_hcl_nu0 = st.text_input("HCl (v''=0 → v'=1) — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresá el valor obtenido")
+        v_h35cl_b0 = st.text_input("H³⁵Cl — Constante B₀ (cm⁻¹):", placeholder="Ingresá el valor obtenido")
+        v_h37cl_nu0 = st.text_input("H³⁷Cl — Origen de banda ν₀ (cm⁻¹):", placeholder="Ingresá el valor obtenido")
 
         if st.button("Comprobar Tabla"):
             aciertos = 0
@@ -422,137 +403,96 @@ with tabs[3]:
                 if aciertos == 5:
                     st.success("🎉 ¡Excelente! Todos los valores cargados coinciden con el simulador.")
                 else:
-                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisa tus mediciones en los Módulos 2 y 3.")
+                    st.warning(f"Coinciden {aciertos} de 5 valores. Revisá tus mediciones en los Módulos 2 y 3.")
             except ValueError:
-                st.error("Por favor, ingresa únicamente valores numéricos.")
+                st.error("Por favor, ingresá únicamente valores numéricos.")
 
     st.divider()
 
     st.subheader("Pregunta Final")
     respuesta_final = st.text_area(
         "¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta? (Responde considerando el momento dipolar):", 
-        placeholder="Escribe tu respuesta aquí..."
+        placeholder="Escribí tu respuesta aquí..."
     )
 
     st.divider()
 
-    # Funciones auxiliares para armar las opciones en el PDF impreso
-    def render_opciones_html(lista_opciones, seleccionada):
-        html_opciones = ""
-        for opt in lista_opciones:
-            if opt == seleccionada:
-                html_opciones += f"<div style='margin-left: 15px; font-weight: bold; color: #1b5e20;'>✔ [ X ] {opt}</div>"
-            else:
-                html_opciones += f"<div style='margin-left: 15px; color: #555;'>[ &nbsp; ] {opt}</div>"
-        return html_opciones
+    st.subheader("Generación del Comprobante PDF")
+    st.write("Presioná el botón para generar y descargar tu informe listo para entregar al docente.")
 
-    # REPORTE DE IMPRESIÓN LIMPIO CON CSS DEDICADO
-    html_reporte = f"""
-    <style>
-        @media print {{
-            /* Oculta la aplicación interactiva completa */
-            .main, [data-testid="stHeader"], footer, header, .custom-footer {{
-                display: none !important;
-            }}
-            /* Muestra únicamente el contenedor de reporte */
-            .reporte-contenedor {{
-                display: block !important;
-                position: absolute;
-                top: 0;
-                left: 0;
-                width: 100%;
-                background: white !important;
-                color: black !important;
-                font-family: Arial, sans-serif !important;
-                font-size: 13px !important;
-                line-height: 1.4 !important;
-            }}
-            .pregunta-box {{
-                margin-bottom: 12px;
-                padding-bottom: 6px;
-                border-bottom: 1px dashed #ccc;
-            }}
-        }}
-    </style>
+    # FUNCIÓN DE GENERACIÓN DIRECTA DE PDF CON REPORTLAB
+    def generar_pdf_entregable():
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
+        styles = getSampleStyleSheet()
+        story = []
 
-    <div class="reporte-contenedor" style="display:none;">
-        <h2 style="text-align:center; margin-bottom: 2px;">UNLPam - FCEyN | Laboratorio de Espectroscopía</h2>
-        <h3 style="text-align:center; margin-top: 0; border-bottom: 2px solid #000; padding-bottom: 6px;">Comprobante de Práctica y Autoevaluación</h3>
-        
-        <table style="width:100%; margin-bottom: 15px;">
-            <tr>
-                <td><strong>Estudiante:</strong> {nombre_alumno if nombre_alumno else "--------------------"}</td>
-                <td><strong>Legajo / DNI:</strong> {legajo_alumno if legajo_alumno else "--------------------"}</td>
-                <td style="text-align:right;"><strong>Puntaje:</strong> {score} / 100 pts</td>
-            </tr>
-        </table>
+        # Estilos personalizados
+        title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=15, alignment=1, spaceAfter=4)
+        subtitle_style = ParagraphStyle('SubTitleStyle', parent=styles['Normal'], fontSize=11, alignment=1, textColor=colors.HexColor('#444444'), spaceAfter=12)
+        h2_style = ParagraphStyle('H2Style', parent=styles['Heading2'], fontSize=11, backColor=colors.HexColor('#EFEFEF'), spaceBefore=8, spaceAfter=6, leftIndent=4)
+        text_style = ParagraphStyle('TextStyle', parent=styles['Normal'], fontSize=9.5, leading=12)
+        opt_sel_style = ParagraphStyle('OptSelStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#1B5E20'), leftIndent=12)
+        opt_style = ParagraphStyle('OptStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#666666'), leftIndent=12)
 
-        <h4 style="background-color: #eee; padding: 4px; margin-bottom: 8px;">1. Autoevaluación Conceptual</h4>
-        
-        <div class="pregunta-box">
-            <p><strong>1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?</strong> (Puntos: {p1}/20)</p>
-            {render_opciones_html(opts_q1, q1)}
-        </div>
+        # Encabezado
+        story.append(Paragraph("<b>UNLPam - FCEyN | Laboratorio de Espectroscopía</b>", title_style))
+        story.append(Paragraph("Comprobante de Práctica y Autoevaluación", subtitle_style))
 
-        <div class="pregunta-box">
-            <p><strong>2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?</strong> (Puntos: {p2}/20)</p>
-            {render_opciones_html(opts_q2, q2)}
-        </div>
+        # Datos Alumno
+        nom = nombre_alumno if nombre_alumno else "--------------------"
+        leg = legajo_alumno if legajo_alumno else "--------------------"
+        tabla_datos = Table([[f"<b>Estudiante:</b> {nom}", f"<b>Legajo/DNI:</b> {leg}", f"<b>Puntaje:</b> {score}/100 pts"]], colWidths=[220, 180, 140])
+        tabla_datos.setStyle(TableStyle([('VALIGN', (0,0), (-1,-1), 'MIDDLE'), ('FONTSIZE', (0,0), (-1,-1), 10)]))
+        story.append(tabla_datos)
+        story.append(Spacer(1, 8))
 
-        <div class="pregunta-box">
-            <p><strong>3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?</strong> (Puntos: {p3}/20)</p>
-            {render_opciones_html(opts_q3, q3)}
-        </div>
+        # 1. Autoevaluación
+        story.append(Paragraph("1. Autoevaluación Conceptual", h2_style))
+        preguntas = [
+            ("1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?", opts_q1, q1, p1),
+            ("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2, q2, p2),
+            ("3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?", opts_q3, q3, p3),
+            ("4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación IR?", opts_q4, q4, p4),
+            ("5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?", opts_q5, q5, p5)
+        ]
 
-        <div class="pregunta-box">
-            <p><strong>4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación Infrarroja (IR)?</strong> (Puntos: {p4}/20)</p>
-            {render_opciones_html(opts_q4, q4)}
-        </div>
+        for tit, opts, sel, pts in preguntas:
+            story.append(Paragraph(f"<b>{tit}</b> (Puntos: {pts}/20)", text_style))
+            for o in opts:
+                if o == sel:
+                    story.append(Paragraph(f"<b>[ X ] {o}</b> (Seleccionada)", opt_sel_style))
+                else:
+                    story.append(Paragraph(f"[ &nbsp; ] {o}", opt_style))
+            story.append(Spacer(1, 3))
 
-        <div class="pregunta-box">
-            <p><strong>5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?</strong> (Puntos: {p5}/20)</p>
-            {render_opciones_html(opts_q5, q5)}
-        </div>
+        # 2. Tabla de Resultados
+        story.append(Paragraph("2. Tabla de Resultados Experimentales", h2_style))
+        story.append(Paragraph(f"• <b>DF (v''=0 → v'=1) — Origen ν₀:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>CO (v''=0) — Constante B₀:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>HCl (v''=0 → v'=1) — Origen ν₀:</b> {v_hcl_nu0 if v_hcl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>H³⁵Cl — Constante B₀:</b> {v_h35cl_b0 if v_h35cl_b0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>H³⁷Cl — Origen ν₀:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Spacer(1, 4))
 
-        <h4 style="background-color: #eee; padding: 4px; margin-top: 15px; margin-bottom: 8px;">2. Tabla de Resultados Experimentales</h4>
-        <ul style="margin-top: 5px;">
-            <li><strong>DF (v''=0 → v'=1) — Origen ν₀:</strong> {v_df_nu0 if v_df_nu0 else "Sin registrar"}</li>
-            <li><strong>CO (v''=0) — Constante B₀:</strong> {v_co_b0 if v_co_b0 else "Sin registrar"}</li>
-            <li><strong>HCl (v''=0 → v'=1) — Origen ν₀:</strong> {v_hcl_nu0 if v_hcl_nu0 else "Sin registrar"}</li>
-            <li><strong>H³⁵Cl — Constante B₀:</strong> {v_h35cl_b0 if v_h35cl_b0 else "Sin registrar"}</li>
-            <li><strong>H³⁷Cl — Origen ν₀:</strong> {v_h37cl_nu0 if v_h37cl_nu0 else "Sin registrar"}</li>
-        </ul>
+        # 3. Pregunta Final
+        story.append(Paragraph("3. Pregunta Conceptual Final", h2_style))
+        story.append(Paragraph("<b>Consigna:</b> ¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta?", text_style))
+        resp = respuesta_final if respuesta_final else "Sin respuesta ingresada."
+        story.append(Spacer(1, 3))
+        story.append(Paragraph(f"<i>{resp}</i>", text_style))
 
-        <h4 style="background-color: #eee; padding: 4px; margin-top: 15px; margin-bottom: 8px;">3. Pregunta Conceptual Final</h4>
-        <p><strong>Consigna:</strong> ¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta? (Responde considerando el momento dipolar)</p>
-        <div style="border: 1px solid #000; padding: 8px; min-height: 50px; background-color: #fafafa;">
-            {respuesta_final if respuesta_final else "Sin respuesta ingresada."}
-        </div>
-    </div>
-    """
-    
-    st.markdown(html_reporte, unsafe_allow_html=True)
+        doc.build(story)
+        buffer.seek(0)
+        return buffer.getvalue()
 
-    st.subheader("Generación del Comprobante de Práctica")
-    st.write("Presiona el botón para descargar o imprimir tu hoja de autoevaluación y entregar al docente.")
-
-    st.components.v1.html(
-        """
-        <button onclick="window.parent.print()" style="
-            background-color: #2e7d32;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            font-size: 15px;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-        ">
-            🖨️ Imprimir Comprobante en PDF
-        </button>
-        """,
-        height=50
+    # BOTÓN DE DESCARGA DIRECTA STREAMLIT
+    pdf_data = generar_pdf_entregable()
+    st.download_button(
+        label="📄 Descargar Comprobante PDF",
+        data=pdf_data,
+        file_name=f"Comprobante_{legajo_alumno if legajo_alumno else 'Practica'}.pdf",
+        mime="application/pdf"
     )
 
 # -----------------------------------------------------------------------------
