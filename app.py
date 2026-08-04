@@ -375,35 +375,27 @@ with tabs[3]:
 
     col_eval1, col_eval2 = st.columns(2)
     
+    # Opciones de las preguntas
+    opts_q1 = ["a) ΔJ = -1", "b) ΔJ = +1", "c) ΔJ = 0", "d) ΔJ = +2"]
+    opts_q2 = ["a) La intensidad máxima se desplaza hacia valores de J más altos", "b) Los picos se vuelven más angostos", "c) Desaparece la rama P", "d) El origen de la banda se desplaza a mayor frecuencia"]
+    opts_q3 = ["a) Su constante de fuerza k es menor", "b) Tiene mayor masa reducida (μ)", "c) Su enlace es más corto", "d) Posee un momento dipolar nulo"]
+    opts_q4 = ["a) La molécula debe ser homonuclear", "b) Debe haber un cambio en el momento dipolar durante la vibración", "c) La temperatura debe ser mayor a 500 K", "d) El momento angular orbital debe ser cero"]
+    opts_q5 = ["a) Los picos se separan más entre sí", "b) Las líneas se ensanchan y solapan perdiendo resolución", "c) Cambia la posición del origen de banda ν₀", "d) Aumenta la constante rotacional B"]
+
     with col_eval1:
         st.subheader("Autoevaluación Conceptual")
-        q1 = st.radio(
-            "1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?", 
-            ["a) ΔJ = -1", "b) ΔJ = +1", "c) ΔJ = 0", "d) ΔJ = +2"]
-        )
-        q2 = st.radio(
-            "2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", 
-            ["a) La intensidad máxima se desplaza hacia valores de J más altos", "b) Los picos se vuelven más angostos", "c) Desaparece la rama P", "d) El origen de la banda se desplaza a mayor frecuencia"]
-        )
-        q3 = st.radio(
-            "3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?", 
-            ["a) Su constante de fuerza k es menor", "b) Tiene mayor masa reducida (μ)", "c) Su enlace es más corto", "d) Posee un momento dipolar nulo"]
-        )
-        q4 = st.radio(
-            "4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación Infrarroja (IR)?", 
-            ["a) La molécula debe ser homonuclear", "b) Debe haber un cambio en el momento dipolar durante la vibración", "c) La temperatura debe ser mayor a 500 K", "d) El momento angular orbital debe ser cero"]
-        )
-        q5 = st.radio(
-            "5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?", 
-            ["a) Los picos se separan más entre sí", "b) Las líneas se ensanchan y solapan perdiendo resolución", "c) Cambia la posición del origen de banda ν₀", "d) Aumenta la constante rotacional B"]
-        )
+        q1 = st.radio("1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?", opts_q1)
+        q2 = st.radio("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2)
+        q3 = st.radio("3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?", opts_q3)
+        q4 = st.radio("4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación Infrarroja (IR)?", opts_q4)
+        q5 = st.radio("5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?", opts_q5)
         
-        score = 0
-        if "b)" in q1: score += 20
-        if "a)" in q2: score += 20
-        if "b)" in q3: score += 20
-        if "b)" in q4: score += 20
-        if "b)" in q5: score += 20
+        p1 = 20 if "b)" in q1 else 0
+        p2 = 20 if "a)" in q2 else 0
+        p3 = 20 if "b)" in q3 else 0
+        p4 = 20 if "b)" in q4 else 0
+        p5 = 20 if "b)" in q5 else 0
+        score = p1 + p2 + p3 + p4 + p5
         
         if st.button("Verificar Respuestas"):
             st.success(f"Puntaje de autoevaluación: {score} / 100")
@@ -444,45 +436,105 @@ with tabs[3]:
 
     st.divider()
 
-    # BLOQUE DE REPORTE LIMPIO PARA IMPRESIÓN PDF
-    st.subheader("Generación del Comprobante de Práctica")
-    st.write("Presiona el botón para descargar o imprimir tu hoja de autoevaluación y entregar al docente.")
+    # Funciones auxiliares para armar las opciones en el PDF impreso
+    def render_opciones_html(lista_opciones, seleccionada):
+        html_opciones = ""
+        for opt in lista_opciones:
+            if opt == seleccionada:
+                html_opciones += f"<div style='margin-left: 15px; font-weight: bold; color: #1b5e20;'>✔ [ X ] {opt}</div>"
+            else:
+                html_opciones += f"<div style='margin-left: 15px; color: #555;'>[ &nbsp; ] {opt}</div>"
+        return html_opciones
 
+    # REPORTE DE IMPRESIÓN LIMPIO CON CSS DEDICADO
     html_reporte = f"""
-    <div class="reporte-impresion" style="display:none;">
-        <h2 style="text-align:center; border-bottom: 2px solid #000; padding-bottom: 8px;">UNLPam - FCEyN | Laboratorio de Espectroscopía</h2>
-        <h3 style="text-align:center; margin-top: 5px;">Comprobante de Práctica y Autoevaluación</h3>
-        <br>
-        <p><strong>Estudiante:</strong> {nombre_alumno if nombre_alumno else "--------------------"}</p>
-        <p><strong>Legajo / DNI:</strong> {legajo_alumno if legajo_alumno else "--------------------"}</p>
-        <hr>
-        <h4>1. Respuestas de Autoevaluación Conceptual</h4>
-        <ul>
-            <li><strong>Pregunta 1 (Rama R):</strong> {q1}</li>
-            <li><strong>Pregunta 2 (Temperatura):</strong> {q2}</li>
-            <li><strong>Pregunta 3 (Isótopos):</strong> {q3}</li>
-            <li><strong>Pregunta 4 (Condición IR):</strong> {q4}</li>
-            <li><strong>Pregunta 5 (Ancho γ):</strong> {q5}</li>
+    <style>
+        @media print {{
+            /* Oculta la aplicación interactiva completa */
+            .main, [data-testid="stHeader"], footer, header, .custom-footer {{
+                display: none !important;
+            }}
+            /* Muestra únicamente el contenedor de reporte */
+            .reporte-contenedor {{
+                display: block !important;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+                font-family: Arial, sans-serif !important;
+                font-size: 13px !important;
+                line-height: 1.4 !important;
+            }}
+            .pregunta-box {{
+                margin-bottom: 12px;
+                padding-bottom: 6px;
+                border-bottom: 1px dashed #ccc;
+            }}
+        }}
+    </style>
+
+    <div class="reporte-contenedor" style="display:none;">
+        <h2 style="text-align:center; margin-bottom: 2px;">UNLPam - FCEyN | Laboratorio de Espectroscopía</h2>
+        <h3 style="text-align:center; margin-top: 0; border-bottom: 2px solid #000; padding-bottom: 6px;">Comprobante de Práctica y Autoevaluación</h3>
+        
+        <table style="width:100%; margin-bottom: 15px;">
+            <tr>
+                <td><strong>Estudiante:</strong> {nombre_alumno if nombre_alumno else "--------------------"}</td>
+                <td><strong>Legajo / DNI:</strong> {legajo_alumno if legajo_alumno else "--------------------"}</td>
+                <td style="text-align:right;"><strong>Puntaje:</strong> {score} / 100 pts</td>
+            </tr>
+        </table>
+
+        <h4 style="background-color: #eee; padding: 4px; margin-bottom: 8px;">1. Autoevaluación Conceptual</h4>
+        
+        <div class="pregunta-box">
+            <p><strong>1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?</strong> (Puntos: {p1}/20)</p>
+            {render_opciones_html(opts_q1, q1)}
+        </div>
+
+        <div class="pregunta-box">
+            <p><strong>2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?</strong> (Puntos: {p2}/20)</p>
+            {render_opciones_html(opts_q2, q2)}
+        </div>
+
+        <div class="pregunta-box">
+            <p><strong>3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?</strong> (Puntos: {p3}/20)</p>
+            {render_opciones_html(opts_q3, q3)}
+        </div>
+
+        <div class="pregunta-box">
+            <p><strong>4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación Infrarroja (IR)?</strong> (Puntos: {p4}/20)</p>
+            {render_opciones_html(opts_q4, q4)}
+        </div>
+
+        <div class="pregunta-box">
+            <p><strong>5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?</strong> (Puntos: {p5}/20)</p>
+            {render_opciones_html(opts_q5, q5)}
+        </div>
+
+        <h4 style="background-color: #eee; padding: 4px; margin-top: 15px; margin-bottom: 8px;">2. Tabla de Resultados Experimentales</h4>
+        <ul style="margin-top: 5px;">
+            <li><strong>DF (v''=0 → v'=1) — Origen ν₀:</strong> {v_df_nu0 if v_df_nu0 else "Sin registrar"}</li>
+            <li><strong>CO (v''=0) — Constante B₀:</strong> {v_co_b0 if v_co_b0 else "Sin registrar"}</li>
+            <li><strong>HCl (v''=0 → v'=1) — Origen ν₀:</strong> {v_hcl_nu0 if v_hcl_nu0 else "Sin registrar"}</li>
+            <li><strong>H³⁵Cl — Constante B₀:</strong> {v_h35cl_b0 if v_h35cl_b0 else "Sin registrar"}</li>
+            <li><strong>H³⁷Cl — Origen ν₀:</strong> {v_h37cl_nu0 if v_h37cl_nu0 else "Sin registrar"}</li>
         </ul>
-        <p><strong>Puntaje Obtenido:</strong> {score} / 100</p>
-        <hr>
-        <h4>2. Tabla de Resultados Experimentales</h4>
-        <ul>
-            <li><strong>DF ν₀:</strong> {v_df_nu0 if v_df_nu0 else "Sin responder"}</li>
-            <li><strong>CO B₀:</strong> {v_co_b0 if v_co_b0 else "Sin responder"}</li>
-            <li><strong>HCl ν₀:</strong> {v_hcl_nu0 if v_hcl_nu0 else "Sin responder"}</li>
-            <li><strong>H³⁵Cl B₀:</strong> {v_h35cl_b0 if v_h35cl_b0 else "Sin responder"}</li>
-            <li><strong>H³⁷Cl ν₀:</strong> {v_h37cl_nu0 if v_h37cl_nu0 else "Sin responder"}</li>
-        </ul>
-        <hr>
-        <h4>3. Respuesta Conceptual Final</h4>
-        <p style="border: 1px solid #ccc; padding: 10px; min-height: 80px;">
+
+        <h4 style="background-color: #eee; padding: 4px; margin-top: 15px; margin-bottom: 8px;">3. Pregunta Conceptual Final</h4>
+        <p><strong>Consigna:</strong> ¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta? (Responde considerando el momento dipolar)</p>
+        <div style="border: 1px solid #000; padding: 8px; min-height: 50px; background-color: #fafafa;">
             {respuesta_final if respuesta_final else "Sin respuesta ingresada."}
-        </p>
+        </div>
     </div>
     """
     
     st.markdown(html_reporte, unsafe_allow_html=True)
+
+    st.subheader("Generación del Comprobante de Práctica")
+    st.write("Presiona el botón para descargar o imprimir tu hoja de autoevaluación y entregar al docente.")
 
     st.components.v1.html(
         """
@@ -497,7 +549,7 @@ with tabs[3]:
             border-radius: 4px;
             cursor: pointer;
         ">
-            Imprimir Comprobante en PDF
+            🖨️ Imprimir Comprobante en PDF
         </button>
         """,
         height=50
