@@ -357,11 +357,32 @@ with tabs[3]:
 
     col_eval1, col_eval2 = st.columns(2)
     
+    # Opciones formateadas sin código LaTeX para visualización e impresión perfecta
     opts_q1 = ["a) ΔJ = -1", "b) ΔJ = +1", "c) ΔJ = 0", "d) ΔJ = +2"]
-    opts_q2 = ["a) La intensidad máxima se desplaza hacia valores de J más altos", "b) Los picos se vuelven más angostos", "c) Desaparece la rama P", "d) El origen de la banda se desplaza a mayor frecuencia"]
-    opts_q3 = ["a) Su constante de fuerza k es menor", "b) Tiene mayor masa reducida (μ)", "c) Su enlace es más corto", "d) Posee un momento dipolar nulo"]
-    opts_q4 = ["a) La molécula debe ser homonuclear", "b) Debe haber un cambio en el momento dipolar durante la vibración", "c) La temperatura debe ser mayor a 500 K", "d) El momento angular orbital debe ser cero"]
-    opts_q5 = ["a) Los picos se separan más entre sí", "b) Las líneas se ensanchan y solapan perdiendo resolución", "c) Cambia la posición del origen de banda ν₀", "d) Aumenta la constante rotacional B"]
+    opts_q2 = [
+        "a) La intensidad máxima se desplaza hacia valores de J más altos", 
+        "b) Los picos se vuelven más angostos", 
+        "c) Desaparece la rama P", 
+        "d) El origen de la banda se desplaza a mayor frecuencia"
+    ]
+    opts_q3 = [
+        "a) Su constante de fuerza k es menor", 
+        "b) Tiene mayor masa reducida (μ)", 
+        "c) Su enlace es más corto", 
+        "d) Posee un momento dipolar nulo"
+    ]
+    opts_q4 = [
+        "a) La molécula debe ser homonuclear", 
+        "b) Debe haber un cambio en el momento dipolar durante la vibración", 
+        "c) La temperatura debe ser mayor a 500 K", 
+        "d) El momento angular orbital debe ser cero"
+    ]
+    opts_q5 = [
+        "a) Los picos se separan más entre sí", 
+        "b) Las líneas se ensanchan y solapan perdiendo resolución", 
+        "c) Cambia la posición del origen de banda ν₀", 
+        "d) Aumenta la constante rotacional B"
+    ]
 
     with col_eval1:
         st.subheader("Autoevaluación Conceptual")
@@ -420,14 +441,14 @@ with tabs[3]:
     st.subheader("Generación del Comprobante PDF")
     st.write("Presioná el botón para generar y descargar tu informe listo para entregar al docente.")
 
-    # FUNCIÓN DE GENERACIÓN DIRECTA DE PDF CON REPORTLAB
+    # GENERACIÓN DE PDF VECTORIAL FORMATEADO PARA REPORTLAB
     def generar_pdf_entregable():
         buffer = io.BytesIO()
         doc = SimpleDocTemplate(buffer, pagesize=letter, rightMargin=36, leftMargin=36, topMargin=36, bottomMargin=36)
         styles = getSampleStyleSheet()
         story = []
 
-        # Estilos personalizados
+        # Estilos visuales del PDF
         title_style = ParagraphStyle('TitleStyle', parent=styles['Heading1'], fontSize=15, alignment=1, spaceAfter=4)
         subtitle_style = ParagraphStyle('SubTitleStyle', parent=styles['Normal'], fontSize=11, alignment=1, textColor=colors.HexColor('#444444'), spaceAfter=12)
         h2_style = ParagraphStyle('H2Style', parent=styles['Heading2'], fontSize=11, backColor=colors.HexColor('#EFEFEF'), spaceBefore=8, spaceAfter=6, leftIndent=4)
@@ -435,11 +456,11 @@ with tabs[3]:
         opt_sel_style = ParagraphStyle('OptSelStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#1B5E20'), leftIndent=12)
         opt_style = ParagraphStyle('OptStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#666666'), leftIndent=12)
 
-        # Encabezado
+        # Encabezado principal
         story.append(Paragraph("<b>UNLPam - FCEyN | Laboratorio de Espectroscopía</b>", title_style))
         story.append(Paragraph("Comprobante de Práctica y Autoevaluación", subtitle_style))
 
-        # Datos Alumno
+        # Cuadro de Datos del Alumno
         nom = nombre_alumno if nombre_alumno else "--------------------"
         leg = legajo_alumno if legajo_alumno else "--------------------"
         tabla_datos = Table([[f"<b>Estudiante:</b> {nom}", f"<b>Legajo/DNI:</b> {leg}", f"<b>Puntaje:</b> {score}/100 pts"]], colWidths=[220, 180, 140])
@@ -447,37 +468,39 @@ with tabs[3]:
         story.append(tabla_datos)
         story.append(Spacer(1, 8))
 
-        # 1. Autoevaluación
+        # Section 1: Autoevaluación Conceptual
         story.append(Paragraph("1. Autoevaluación Conceptual", h2_style))
         preguntas = [
-            ("1. ¿A qué cambio en el número cuántico rotacional (ΔJ) corresponde la Rama R?", opts_q1, q1, p1),
+            ("1. ¿A qué cambio en el número cuántico rotacional (&Delta;J) corresponde la Rama R?", opts_q1, q1, p1),
             ("2. Al aumentar la Temperatura (K) en el simulador, ¿qué sucede con el perfil del espectro?", opts_q2, q2, p2),
-            ("3. En la comparación de H³⁵Cl y H³⁷Cl (Módulo 2), ¿por qué H³⁷Cl absorbe a menores números de onda?", opts_q3, q3, p3),
+            ("3. En la comparación de H<sup>35</sup>Cl y H<sup>37</sup>Cl (Módulo 2), ¿por qué H<sup>37</sup>Cl absorbe a menores números de onda?", opts_q3, q3, p3),
             ("4. ¿Qué condición debe cumplirse para que una vibración molecular absorba radiación IR?", opts_q4, q4, p4),
-            ("5. Al incrementar el Ancho mitad de altura (γ), ¿qué efecto se observa en las bandas?", opts_q5, q5, p5)
+            ("5. Al incrementar el Ancho mitad de altura (&gamma;), ¿qué efecto se observa en las bandas?", opts_q5, q5, p5)
         ]
 
         for tit, opts, sel, pts in preguntas:
             story.append(Paragraph(f"<b>{tit}</b> (Puntos: {pts}/20)", text_style))
             for o in opts:
+                # Formatear superíndices para ReportLab
+                o_clean = o.replace("H³⁵Cl", "H<sup>35</sup>Cl").replace("H³⁷Cl", "H<sup>37</sup>Cl")
                 if o == sel:
-                    story.append(Paragraph(f"<b>[ X ] {o}</b> (Seleccionada)", opt_sel_style))
+                    story.append(Paragraph(f"<b>[ X ] {o_clean}</b> (Seleccionada)", opt_sel_style))
                 else:
-                    story.append(Paragraph(f"[ &nbsp; ] {o}", opt_style))
+                    story.append(Paragraph(f"[ &nbsp; ] {o_clean}", opt_style))
             story.append(Spacer(1, 3))
 
-        # 2. Tabla de Resultados
+        # Section 2: Tabla de Resultados
         story.append(Paragraph("2. Tabla de Resultados Experimentales", h2_style))
-        story.append(Paragraph(f"• <b>DF (v''=0 → v'=1) — Origen ν₀:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>CO (v''=0) — Constante B₀:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>HCl (v''=0 → v'=1) — Origen ν₀:</b> {v_hcl_nu0 if v_hcl_nu0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>H³⁵Cl — Constante B₀:</b> {v_h35cl_b0 if v_h35cl_b0 else 'Sin registrar'}", text_style))
-        story.append(Paragraph(f"• <b>H³⁷Cl — Origen ν₀:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>DF (v''=0 &rarr; v'=1) &mdash; Origen &nu;<sub>0</sub>:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>CO (v''=0) &mdash; Constante B<sub>0</sub>:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>HCl (v''=0 &rarr; v'=1) &mdash; Origen &nu;<sub>0</sub>:</b> {v_hcl_nu0 if v_hcl_nu0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>H<sup>35</sup>Cl &mdash; Constante B<sub>0</sub>:</b> {v_h35cl_b0 if v_h35cl_b0 else 'Sin registrar'}", text_style))
+        story.append(Paragraph(f"• <b>H<sup>37</sup>Cl &mdash; Origen &nu;<sub>0</sub>:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
         story.append(Spacer(1, 4))
 
-        # 3. Pregunta Final
+        # Section 3: Pregunta Final
         story.append(Paragraph("3. Pregunta Conceptual Final", h2_style))
-        story.append(Paragraph("<b>Consigna:</b> ¿Por qué el CO presenta espectro rotacional mientras que el N₂ no lo presenta?", text_style))
+        story.append(Paragraph("<b>Consigna:</b> ¿Por qué el CO presenta espectro rotacional mientras que el N<sub>2</sub> no lo presenta?", text_style))
         resp = respuesta_final if respuesta_final else "Sin respuesta ingresada."
         story.append(Spacer(1, 3))
         story.append(Paragraph(f"<i>{resp}</i>", text_style))
@@ -486,7 +509,7 @@ with tabs[3]:
         buffer.seek(0)
         return buffer.getvalue()
 
-    # BOTÓN DE DESCARGA DIRECTA STREAMLIT
+    # BOTÓN DE DESCARGA PDF EN STREAMLIT
     pdf_data = generar_pdf_entregable()
     st.download_button(
         label="📄 Descargar Comprobante PDF",
