@@ -238,7 +238,7 @@ with tabs[1]:
     """)
 
 # -----------------------------------------------------------------------------
-# MÓDULO 3: SIMULADOR COMPLETO (SISTEMA MATEMÁTICO UAM CON EXPORTACIÓN A PDF)
+# MÓDULO 3: SIMULADOR COMPLETO (SISTEMA CON BOTÓN ENVIAR Y EXPORTACIÓN PDF)
 # -----------------------------------------------------------------------------
 with tabs[2]:
     st.header("Simulador de Espectros de Rotación-Vibración")
@@ -246,37 +246,43 @@ with tabs[2]:
     col_panel, col_grafico = st.columns([1, 2.8])
     
     with col_panel:
-        st.subheader("Parámetros de Control")
-        mol_key = st.selectbox(
-            "Seleccionar Molécula:", 
-            options=list(PARAMETROS_UAM.keys()),
-            format_func=lambda x: f"{x} - {PARAMETROS_UAM[x]['nombre']}"
-        )
-        
-        col_v0, col_v1 = st.columns(2)
-        with col_v0:
-            v0 = st.number_input("Nivel v''", min_value=0, max_value=20, value=0, step=1)
-        with col_v1:
-            v1 = st.number_input("---> Nivel v'", min_value=0, max_value=20, value=1, step=1)
+        # Formulario estilo UAM: no recalcula la gráfica hasta presionar "Enviar"
+        with st.form(key="form_simulador_uam"):
+            st.subheader("Parámetros de Control")
             
-        T = st.number_input(
-            "Temperatura (K):", 
-            min_value=10.0, 
-            max_value=1000.0, 
-            value=298.0, 
-            step=1.0, 
-            format="%.1f"
-        )
-        
-        gamma = st.number_input(
-            "Ancho mitad de altura (γ):", 
-            min_value=0.01, 
-            max_value=5.00, 
-            value=1.00, 
-            step=0.01, 
-            format="%.2f"
-        )
-        
+            mol_key = st.selectbox(
+                "Seleccionar Molécula:", 
+                options=list(PARAMETROS_UAM.keys()),
+                format_func=lambda x: f"{x} - {PARAMETROS_UAM[x]['nombre']}"
+            )
+            
+            col_v0, col_v1 = st.columns(2)
+            with col_v0:
+                v0 = st.number_input("Nivel v''", min_value=0, max_value=20, value=0, step=1)
+            with col_v1:
+                v1 = st.number_input("---> Nivel v'", min_value=0, max_value=20, value=1, step=1)
+                
+            T = st.number_input(
+                "Temperatura (K):", 
+                min_value=10.0, 
+                max_value=1000.0, 
+                value=298.0, 
+                step=1.0, 
+                format="%.1f"
+            )
+            
+            gamma = st.number_input(
+                "Ancho mitad de altura (γ):", 
+                min_value=0.01, 
+                max_value=5.00, 
+                value=1.00, 
+                step=0.01, 
+                format="%.2f"
+            )
+            
+            btn_enviar = st.form_submit_button("Enviar")
+
+        # Cálculos de constantes
         p = PARAMETROS_UAM[mol_key]
         B0 = obtener_B_v(v0, p)
         B1 = obtener_B_v(v1, p)
@@ -289,91 +295,86 @@ with tabs[2]:
         * $\\nu_0 = {nu0:.1f}\\text{{ cm}}^{{-1}}$
         """)
 
+    # Cálculos matemáticos del espectro
+    J_max = 40
+    lineas_frec, lineas_int = [], []
+
+    # Rama P (ΔJ = -1)
+    for J in range(1, J_max):
+        frec = nu0 - (B1 + B0)*J + (B1 - B0)*(J**2)
+        pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
+        if pob > 1e-5:
+            lineas_frec.append(frec)
+            lineas_int.append(pob)
+
+    # Rama R (ΔJ = +1)
+    for J in range(0, J_max):
+        frec = nu0 + (B1 + B0)*(J + 1) + (B1 - B0)*((J + 1)**2)
+        pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
+        if pob > 1e-5:
+            lineas_frec.append(frec)
+            lineas_int.append(pob)
+
+    if len(lineas_frec) == 0:
+        lineas_frec, lineas_int = [nu0], [1.0]
+
+    min_frec, max_frec = min(lineas_frec), max(lineas_frec)
+    ancho_vista = max_frec - min_frec
+    xmin = min_frec - max(ancho_vista * 0.12, 15.0)
+    xmax = max_frec + max(ancho_vista * 0.12, 15.0)
+
+    nu_eje = generar_rango(xmin, xmax, 3000)
+    espectro = [0.0] * len(nu_eje)
+    
+    for frec, intens in zip(lineas_frec, lineas_int):
+        for i, nu in enumerate(nu_eje):
+            espectro[i] += intens * (gamma**2 / ((nu - frec)**2 + gamma**2))
+
+    max_y = max(espectro) if espectro else 1.0
+
+    fig = go.Figure()
+    fig.add_trace(go.Scatter(
+        x=nu_eje, y=espectro,
+        mode='lines',
+        line=dict(color='purple', width=2),
+        name='Espectro'
+    ))
+
+    fig.update_layout(
+        title=f"Espectro de Rotación-Vibración para {mol_key} (v''={v0} → v'={v1})",
+        xaxis_title="Número de onda (cm⁻¹)",
+        yaxis_title="Intensidad",
+        xaxis=dict(range=[xmin, xmax]),
+        yaxis=dict(range=[0, max_y * 1.1 if max_y > 0 else 1]),
+        height=480,
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)'
+    )
+
     with col_grafico:
-        J_max = 40
-        lineas_frec, lineas_int = [], []
-
-        # Rama P (ΔJ = -1)
-        for J in range(1, J_max):
-            frec = nu0 - (B1 + B0)*J + (B1 - B0)*(J**2)
-            pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
-            if pob > 1e-5:
-                lineas_frec.append(frec)
-                lineas_int.append(pob)
-
-        # Rama R (ΔJ = +1)
-        for J in range(0, J_max):
-            frec = nu0 + (B1 + B0)*(J + 1) + (B1 - B0)*((J + 1)**2)
-            pob = (2*J + 1) * math.exp(-B0 * J * (J + 1) * hc_k / max(T, 1.0))
-            if pob > 1e-5:
-                lineas_frec.append(frec)
-                lineas_int.append(pob)
-
-        if len(lineas_frec) == 0:
-            lineas_frec, lineas_int = [nu0], [1.0]
-
-        min_frec, max_frec = min(lineas_frec), max(lineas_frec)
-        ancho_vista = max_frec - min_frec
-        xmin = min_frec - max(ancho_vista * 0.12, 15.0)
-        xmax = max_frec + max(ancho_vista * 0.12, 15.0)
-
-        nu_eje = generar_rango(xmin, xmax, 3000)
-        espectro = [0.0] * len(nu_eje)
-        
-        for frec, intens in zip(lineas_frec, lineas_int):
-            for i, nu in enumerate(nu_eje):
-                espectro[i] += intens * (gamma**2 / ((nu - frec)**2 + gamma**2))
-
-        max_y = max(espectro) if espectro else 1.0
-
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            x=nu_eje, y=espectro,
-            mode='lines',
-            line=dict(color='purple', width=2),
-            name='Espectro'
-        ))
-
-        # Fondo transparente para evitar parpadeo blanco entre temas
-        fig.update_layout(
-            title=f"Espectro de Rotación-Vibración para {mol_key} (v''={v0} → v'={v1})",
-            xaxis_title="Número de onda (cm⁻¹)",
-            yaxis_title="Intensidad",
-            xaxis=dict(range=[xmin, xmax]),
-            yaxis=dict(range=[0, max_y * 1.1 if max_y > 0 else 1]),
-            height=480,
-            paper_bgcolor='rgba(0,0,0,0)',
-            plot_bgcolor='rgba(0,0,0,0)'
-        )
-
         st.plotly_chart(fig, use_container_width=True)
 
-        # Generación del archivo PDF en memoria
+    # Enlace "Espectro en pdf" abajo a la izquierda estilo UAM
+    with col_panel:
         try:
             pdf_bytes = fig.to_image(format="pdf", width=1000, height=600, scale=2)
             b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
             
-            # Enlace HTML formateado como botón para abrir el PDF en una pestaña nueva
-            pdf_display = f'''
-                <a href="data:application/pdf;base64,{b64_pdf}" target="_blank" style="text-decoration: none;">
-                    <button style="
-                        background-color: #2b5797;
-                        color: white;
-                        border: none;
-                        padding: 9px 18px;
-                        font-size: 14px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                        font-weight: bold;
-                    ">
-                        📄 Abrir Espectro en PDF (Nueva pestaña)
-                    </button>
+            st.markdown(f'''
+                <a href="data:application/pdf;base64,{b64_pdf}" download="Espectro_{mol_key}.pdf" style="
+                    color: #1a73e8;
+                    font-size: 16px;
+                    font-weight: 500;
+                    text-decoration: underline;
+                    display: inline-block;
+                    margin-top: 10px;
+                ">
+                    Espectro en pdf
                 </a>
-            '''
-            st.markdown(pdf_display, unsafe_allow_html=True)
+            ''', unsafe_allow_html=True)
         except Exception:
-            st.info("💡 Sugerencia: Para descargar el gráfico en alta calidad, haz clic en el ícono de la cámara de fotos 📷 que aparece arriba a la derecha del gráfico.")
-
+            st.caption("💡 Para guardar el espectro en PDF o imagen, usá el ícono de la cámara 📷 en el gráfico.")
+            
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
 # -----------------------------------------------------------------------------
