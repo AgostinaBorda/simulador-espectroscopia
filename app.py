@@ -456,11 +456,24 @@ with tabs[3]:
         opt_sel_style = ParagraphStyle('OptSelStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#1B5E20'), leftIndent=12)
         opt_style = ParagraphStyle('OptStyle', parent=styles['Normal'], fontSize=9, leading=11, textColor=colors.HexColor('#666666'), leftIndent=12)
 
+        # Función de saneamiento de texto para el alumno
+        def sanear_texto_html(txt):
+            if not txt:
+                return "Sin respuesta ingresada."
+            reemplazos = {
+                "₂": "<sub>2</sub>", "₀": "<sub>0</sub>", "₁": "<sub>1</sub>",
+                "³": "<sup>3</sup>", "⁵": "<sup>5</sup>", "⁷": "<sup>7</sup>",
+                "≠": "&ne;", "μ": "&mu;", "ν": "v"
+            }
+            for original, html in reemplazos.items():
+                txt = txt.replace(original, html)
+            return txt
+
         # Encabezado principal
         story.append(Paragraph("<b>UNLPam - FCEyN | Laboratorio de Espectroscopía</b>", title_style))
         story.append(Paragraph("Comprobante de Práctica y Autoevaluación", subtitle_style))
 
-        # Datos Alumno (2 columnas centradas)
+        # Datos Alumno
         nom = nombre_alumno if nombre_alumno else "--------------------"
         leg = legajo_alumno if legajo_alumno else "--------------------"
         
@@ -472,7 +485,7 @@ with tabs[3]:
         story.append(tabla_datos)
         story.append(Spacer(1, 8))
 
-        # 1. Autoevaluación Conceptual (Puntaje en el título)
+        # 1. Autoevaluación Conceptual
         story.append(Paragraph(f"1. Autoevaluación Conceptual (Puntaje: {score}/100 pts)", h2_style))
         preguntas = [
             ("1. ¿A qué cambio en el número cuántico rotacional (&Delta;J) corresponde la Rama R?", opts_q1, q1),
@@ -504,7 +517,7 @@ with tabs[3]:
             pass
         score_exp = aciertos_exp * 20
 
-        # 2. Tabla de Resultados (Puntaje en el título)
+        # 2. Tabla de Resultados
         story.append(Paragraph(f"2. Tabla de Resultados Experimentales (Puntaje: {score_exp}/100 pts)", h2_style))
         story.append(Paragraph(f"• <b>DF (v''=0 &rarr; v'=1) &mdash; Origen v<sub>0</sub>:</b> {v_df_nu0 if v_df_nu0 else 'Sin registrar'}", text_style))
         story.append(Paragraph(f"• <b>CO (v''=0) &mdash; Constante B<sub>0</sub>:</b> {v_co_b0 if v_co_b0 else 'Sin registrar'}", text_style))
@@ -513,12 +526,12 @@ with tabs[3]:
         story.append(Paragraph(f"• <b>H<sup>37</sup>Cl &mdash; Origen v<sub>0</sub>:</b> {v_h37cl_nu0 if v_h37cl_nu0 else 'Sin registrar'}", text_style))
         story.append(Spacer(1, 4))
 
-        # 3. Pregunta Final
+        # 3. Pregunta Final (Sanetizado automático del texto ingresado)
         story.append(Paragraph("3. Pregunta Conceptual Final", h2_style))
         story.append(Paragraph("<b>Consigna:</b> ¿Por qué el CO presenta espectro rotacional mientras que el N<sub>2</sub> no lo presenta?", text_style))
-        resp = respuesta_final if respuesta_final else "Sin respuesta ingresada."
+        resp_sanada = sanear_texto_html(respuesta_final)
         story.append(Spacer(1, 3))
-        story.append(Paragraph(f"<i>{resp}</i>", text_style))
+        story.append(Paragraph(f"<i>{resp_sanada}</i>", text_style))
 
         doc.build(story)
         buffer.seek(0)
