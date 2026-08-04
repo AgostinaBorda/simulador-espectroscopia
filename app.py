@@ -354,22 +354,31 @@ with tabs[2]:
     with col_grafico:
         st.plotly_chart(fig, use_container_width=True)
 
-    # Enlace "Espectro en pdf" abajo a la izquierda estilo UAM
+    # Generación y descarga directa del archivo PDF exclusivo de la gráfica
     with col_panel:
-        st.components.v1.html(
-            """
-            <a href="#" onclick="window.parent.print(); return false;" style="
-                color: #1a73e8;
-                font-size: 16px;
-                font-weight: 500;
-                text-decoration: underline;
-                font-family: sans-serif;
-            ">
-                Espectro en pdf
-            </a>
-            """,
-            height=35
-        )
+        try:
+            # Convierte la figura de Plotly directamente a bytes en formato PDF vectorizado
+            pdf_bytes = fig.to_image(format="pdf", width=900, height=600, scale=2)
+            
+            st.download_button(
+                label="Espectro en pdf",
+                data=pdf_bytes,
+                file_name=f"Espectro_{mol_key}.pdf",
+                mime="application/pdf"
+            )
+        except Exception:
+            # Alternativa visual si kaleido no responde en el servidor
+            st.markdown(f'''
+                <a href="#" onclick="const img = document.querySelector('.js-plotly-plot'); window.print(); return false;" style="
+                    color: #1a73e8;
+                    font-size: 16px;
+                    font-weight: 500;
+                    text-decoration: underline;
+                    font-family: sans-serif;
+                ">
+                    Espectro en pdf
+                </a>
+            ''', unsafe_allow_html=True)
 
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
