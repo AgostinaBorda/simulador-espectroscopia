@@ -120,7 +120,7 @@ st.divider()
 tabs = st.tabs([
     "Módulo 1: Introducción",
     "Módulo 2: Efecto Isotópico",
-    "Módulo 3: Simulador Completo",
+    "Módulo 3: Simulador de Espectros de Rotación-Vibración",
     "Módulo 4: Evaluación y Entregable"
 ])
 
