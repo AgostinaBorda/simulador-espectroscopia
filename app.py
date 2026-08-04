@@ -131,17 +131,19 @@ st.markdown("""
 <style>
     .custom-footer {
         text-align: center;
-        padding: 16px;
+        padding: 18px;
         margin-top: 40px;
         border-top: 1px solid rgba(128, 128, 128, 0.3);
         color: var(--text-color);
-        opacity: 0.8;
-        font-size: 14px;
+        opacity: 0.85;
+        font-size: 13.5px;
         font-weight: 500;
+        line-height: 1.5;
     }
 </style>
 <div class="custom-footer">
-    Creado por Agostina Borda y Germán Morazzo
+    Creado por Agostina Borda y Germán Morazzo<br>
+    © 2026 — Todos los derechos reservados.
 </div>
 """, unsafe_allow_html=True)
 
