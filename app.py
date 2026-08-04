@@ -356,25 +356,21 @@ with tabs[2]:
 
     # Enlace "Espectro en pdf" abajo a la izquierda estilo UAM
     with col_panel:
-        try:
-            pdf_bytes = fig.to_image(format="pdf", width=1000, height=600, scale=2)
-            b64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-            
-            st.markdown(f'''
-                <a href="data:application/pdf;base64,{b64_pdf}" download="Espectro_{mol_key}.pdf" style="
-                    color: #1a73e8;
-                    font-size: 16px;
-                    font-weight: 500;
-                    text-decoration: underline;
-                    display: inline-block;
-                    margin-top: 10px;
-                ">
-                    Espectro en pdf
-                </a>
-            ''', unsafe_allow_html=True)
-        except Exception:
-            st.caption("💡 Para guardar el espectro en PDF o imagen, usá el ícono de la cámara 📷 en el gráfico.")
-            
+        st.components.v1.html(
+            """
+            <a href="#" onclick="window.parent.print(); return false;" style="
+                color: #1a73e8;
+                font-size: 16px;
+                font-weight: 500;
+                text-decoration: underline;
+                font-family: sans-serif;
+            ">
+                Espectro en pdf
+            </a>
+            """,
+            height=35
+        )
+
 # -----------------------------------------------------------------------------
 # MÓDULO 4: AUTOEVALUACIÓN Y REGISTRO DE RESULTADOS
 # -----------------------------------------------------------------------------
